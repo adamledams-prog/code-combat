@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Combat - Allié</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            animation: fadeIn 0.8s ease-in;
+            max-width: 800px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ally-avatar {
+            font-size: 8em;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .items-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+            padding: 20px;
+        }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 50px 60px;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }   position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(217, 119, 6, 0.3));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(245, 158, 11, 0.5);
+            border-color: #f59e0b;
+        }
+
+        .item-card:hover::before {
+            opacity: 1;
+        }
+
+        .item-icon {
+            font-size: 6em;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .item-name {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .item-status {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            position: relative;
+            z-index: 1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .story {
+            display: none;
+        }
+
+        .stats {
+            display: none;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            padding: 20px 50px;
+            font-size: 1.8em;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: 3px solid rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(66, 153, 225, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ally-avatar">👨</div>
+        <h1>Ton Allié</h1>
+        <p class="subtitle">Nouveau personnage débloqué !</p>
+
+        <div class="items-grid">
+            <div class="item-card">
+                <div class="item-icon">🪓</div>
+                <div class="item-name">Épée en Bois</div>
+                <div class="item-status">NOUVEAU</div>
+            </div>
+        </div>
+
+        <a href="accueil.html" class="back-button">🏠 Retour à l'Accueil</a>
+    </div>
+</body>
+</html>
