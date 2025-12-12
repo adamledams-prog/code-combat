@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Combat - Victoire!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .trophy {
+            font-size: 8em;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .score-display {
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px 40px;
+            border-radius: 20px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.8em;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(72, 187, 120, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 15px 40px rgba(66, 153, 225, 0.5);
+        }
+
+        .stars {
+            font-size: 3em;
+            margin-bottom: 30px;
+            letter-spacing: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="trophy">🏆</div>
+        <h1>🎉 Victoire! 🎉</h1>
+        <div class="stars">⭐⭐⭐</div>
+        <div class="score-display">
+            Score: <span id="final-score">100</span> points
+        </div>
+        
+        <div class="buttons">
+            <a href="carte.html" class="btn">🗺️ Carte des Niveaux</a>
+            <a href="accueil.html" class="btn btn-secondary">🏠 Accueil</a>
+        </div>
+    </div>
+
+    <script>
+        // Récupérer le score et le niveau depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const score = urlParams.get('score') || 100;
+        const level = urlParams.get('level') || '1';
+        document.getElementById('final-score').textContent = score;
+    </script>
+</body>
+</html>
