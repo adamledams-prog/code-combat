@@ -23,7 +23,10 @@ class Game {
             x: 9,
             y: 6,
             symbol: '👨',
-            freed: false
+            freed: false,
+            moving: false,
+            targetX: null,
+            targetY: null
         };
         
         // Murs en pierre (indestructibles)
@@ -43,9 +46,10 @@ class Game {
         
         // Murs de bois (destructibles) - bloquent l'allié en bas
         this.woodenWalls = [
-            {x: 7, y: 4}, {x: 7, y: 5}, {x: 7, y: 6},
-            {x: 8, y: 5}, {x: 8, y: 6},
-            {x: 9, y: 5}
+            // Mur autour de l'allié
+            {x: 8, y: 4},
+            {x: 6, y: 5}, {x: 7, y: 5}, {x: 8, y: 5}, {x: 9, y: 5}, {x: 10, y: 5},
+            {x: 6, y: 6}, {x: 7, y: 6}, {x: 8, y: 6}, {x: 10, y: 6}
         ];
         
         // Gemme à atteindre - en haut à droite
@@ -173,6 +177,138 @@ class Game {
         }
         return false;
     }
+    
+    canAllyReachGem() {
+        // Vérifier s'il existe un chemin de l'allié vers la gemme
+        const visited = new Set();
+        const queue = [{x: this.ally.x, y: this.ally.y}];
+        
+        while (queue.length > 0) {
+            const pos = queue.shift();
+            const key = `${pos.x},${pos.y}`;
+            
+            if (visited.has(key)) continue;
+            visited.add(key);
+            
+            // Si on a atteint la gemme
+            if (pos.x === this.gem.x && pos.y === this.gem.y) {
+                return true;
+            }
+            
+            // Vérifier les 4 directions
+            const directions = [
+                {x: pos.x + 1, y: pos.y},
+                {x: pos.x - 1, y: pos.y},
+                {x: pos.x, y: pos.y + 1},
+                {x: pos.x, y: pos.y - 1}
+            ];
+            
+            for (let dir of directions) {
+                if (dir.x >= 0 && dir.x < this.cols && 
+                    dir.y >= 0 && dir.y < this.rows &&
+                    !this.isWall(dir.x, dir.y) && 
+                    !this.isWoodenWall(dir.x, dir.y) &&
+                    !visited.has(`${dir.x},${dir.y}`)) {
+                    queue.push(dir);
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    moveAllyToGem() {
+        if (!this.ally.moving || (this.ally.x === this.gem.x && this.ally.y === this.gem.y)) {
+            return;
+        }
+        
+        // Utiliser A* pour trouver le meilleur chemin
+        const path = this.findPath(this.ally.x, this.ally.y, this.gem.x, this.gem.y);
+        
+        if (path && path.length > 1) {
+            // Le premier élément est la position actuelle, le deuxième est la prochaine étape
+            this.ally.x = path[1].x;
+            this.ally.y = path[1].y;
+        }
+        
+        this.draw();
+        
+        // Continuer le mouvement
+        if (this.ally.x !== this.gem.x || this.ally.y !== this.gem.y) {
+            setTimeout(() => this.moveAllyToGem(), 300);
+        } else {
+            // L'allié a atteint la gemme
+            this.ally.moving = false;
+        }
+    }
+    
+    findPath(startX, startY, endX, endY) {
+        // Implémentation simple de A*
+        const openSet = [{x: startX, y: startY, g: 0, h: 0, f: 0, parent: null}];
+        const closedSet = new Set();
+        
+        while (openSet.length > 0) {
+            // Trouver le nœud avec le plus petit f
+            openSet.sort((a, b) => a.f - b.f);
+            const current = openSet.shift();
+            
+            // Si on a atteint la destination
+            if (current.x === endX && current.y === endY) {
+                // Reconstruire le chemin
+                const path = [];
+                let node = current;
+                while (node) {
+                    path.unshift({x: node.x, y: node.y});
+                    node = node.parent;
+                }
+                return path;
+            }
+            
+            closedSet.add(`${current.x},${current.y}`);
+            
+            // Vérifier les 4 directions
+            const neighbors = [
+                {x: current.x + 1, y: current.y},
+                {x: current.x - 1, y: current.y},
+                {x: current.x, y: current.y + 1},
+                {x: current.x, y: current.y - 1}
+            ];
+            
+            for (let neighbor of neighbors) {
+                if (neighbor.x < 0 || neighbor.x >= this.cols || 
+                    neighbor.y < 0 || neighbor.y >= this.rows ||
+                    this.isWall(neighbor.x, neighbor.y) || 
+                    this.isWoodenWall(neighbor.x, neighbor.y) ||
+                    closedSet.has(`${neighbor.x},${neighbor.y}`)) {
+                    continue;
+                }
+                
+                const g = current.g + 1;
+                const h = Math.abs(neighbor.x - endX) + Math.abs(neighbor.y - endY);
+                const f = g + h;
+                
+                // Vérifier si ce voisin est déjà dans openSet
+                const existingNode = openSet.find(n => n.x === neighbor.x && n.y === neighbor.y);
+                
+                if (!existingNode) {
+                    openSet.push({
+                        x: neighbor.x,
+                        y: neighbor.y,
+                        g: g,
+                        h: h,
+                        f: f,
+                        parent: current
+                    });
+                } else if (g < existingNode.g) {
+                    existingNode.g = g;
+                    existingNode.f = g + existingNode.h;
+                    existingNode.parent = current;
+                }
+            }
+        }
+        
+        return null; // Pas de chemin trouvé
+    }
 }
 
 // Initialiser le jeu
@@ -269,17 +405,21 @@ function breakWood() {
             game.breakWood(checkX, checkY);
             woodBroken = true;
             
-            // Vérifier si l'allié est libéré (aucun mur de bois ne le bloque)
-            const allyBlocked = game.woodenWalls.some(wall => 
-                (Math.abs(wall.x - game.ally.x) <= 1 && wall.y === game.ally.y) ||
-                (Math.abs(wall.y - game.ally.y) <= 1 && wall.x === game.ally.x)
-            );
+            // Vérifier si l'allié peut atteindre la sortie
+            const canReachGem = game.canAllyReachGem();
             
-            if (!allyBlocked && !game.ally.freed) {
+            if (canReachGem && !game.ally.freed) {
                 game.ally.freed = true;
+                game.ally.moving = true;
                 game.score += 100;
                 document.getElementById('score').textContent = game.score;
-                alert('🎉 Allié libéré! +100 points! Tu peux maintenant aller chercher la gemme!');
+                alert('🎉 Allié libéré! +100 points! Il se dirige vers la gemme!');
+                
+                // Démarrer le mouvement de l'allié
+                setTimeout(() => game.moveAllyToGem(), 500);
+            } else if (!canReachGem && !game.ally.freed) {
+                // L'allié n'est pas encore libre de sortir
+                console.log('L\'allié ne peut pas encore atteindre la gemme');
             }
             
             break;
