@@ -1,4 +1,4 @@
-// Code Combat - Niveau 2
+// Code Combat - Niveau 3
 class Game {
     constructor() {
         this.canvas = document.getElementById('game-canvas');
@@ -14,41 +14,53 @@ class Game {
         
         this.hero = {
             x: 1,
-            y: 6,
+            y: 1,
             symbol: '🦸',
             health: 3,
             maxHealth: 3
         };
         
-        this.enemy = {
-            x: 5,
-            y: 3,
-            symbol: '👾',
-            health: 1,
-            maxHealth: 1,
-            alive: true,
-            lastAttackTime: 0
-        };
+        // 2 ennemis qui bloquent le seul passage
+        this.enemies = [
+            {
+                x: 6,
+                y: 4,
+                symbol: '👾',
+                health: 1,
+                maxHealth: 1,
+                alive: true
+            },
+            {
+                x: 7,
+                y: 4,
+                symbol: '👾',
+                health: 1,
+                maxHealth: 1,
+                alive: true
+            }
+        ];
         
-        // Murs - Une seule entrée étroite
+        // Murs - Un seul passage au milieu avec 2 ennemis
         this.walls = [
-            // Mur du haut
+            // Cadre extérieur
             {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0}, {x: 4, y: 0}, {x: 5, y: 0}, {x: 6, y: 0}, {x: 7, y: 0}, {x: 8, y: 0}, {x: 9, y: 0}, {x: 10, y: 0}, {x: 11, y: 0},
-            // Mur gauche
             {x: 0, y: 1}, {x: 0, y: 2}, {x: 0, y: 3}, {x: 0, y: 4}, {x: 0, y: 5}, {x: 0, y: 6}, {x: 0, y: 7},
-            // Mur droite
             {x: 11, y: 1}, {x: 11, y: 2}, {x: 11, y: 3}, {x: 11, y: 4}, {x: 11, y: 5}, {x: 11, y: 6}, {x: 11, y: 7},
-            // Mur du bas
             {x: 1, y: 7}, {x: 2, y: 7}, {x: 3, y: 7}, {x: 4, y: 7}, {x: 5, y: 7}, {x: 6, y: 7}, {x: 7, y: 7}, {x: 8, y: 7}, {x: 9, y: 7}, {x: 10, y: 7},
-            // Mur central avec passage étroit
-            {x: 3, y: 1}, {x: 3, y: 2}, {x: 3, y: 4}, {x: 3, y: 5}, {x: 3, y: 6},
-            {x: 7, y: 1}, {x: 7, y: 2}, {x: 7, y: 4}, {x: 7, y: 5}, {x: 7, y: 6}
+            
+            // Grand mur vertical gauche (bloque tout sauf le passage)
+            {x: 5, y: 1}, {x: 5, y: 2}, {x: 5, y: 3}, {x: 5, y: 5}, {x: 5, y: 6},
+            
+            // Grand mur vertical droit (bloque tout sauf le passage)
+            {x: 8, y: 1}, {x: 8, y: 2}, {x: 8, y: 3}, {x: 8, y: 5}, {x: 8, y: 6},
+            
+            // Les 2 ennemis sont à (6,4) et (7,4) - le seul passage entre les murs!
         ];
         
         // Gemme à atteindre
         this.gem = {
-            x: 9,
-            y: 3,
+            x: 10,
+            y: 6,
             symbol: '💎'
         };
         
@@ -62,31 +74,35 @@ class Game {
     
     startEnemyAttacks() {
         this.enemyAttackInterval = setInterval(() => {
-            if (this.enemy.alive && !this.gameOver) {
-                this.enemyAttack();
+            if (!this.gameOver) {
+                this.enemiesAttack();
             }
         }, 1000);
     }
     
-    enemyAttack() {
-        // L'ennemi attaque si le héros est adjacent
-        const dx = Math.abs(this.hero.x - this.enemy.x);
-        const dy = Math.abs(this.hero.y - this.enemy.y);
-        
-        if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-            this.hero.health--;
-            this.updateHealthBar();
-            this.draw();
-            
-            if (this.hero.health <= 0) {
-                this.gameOver = true;
-                clearInterval(this.enemyAttackInterval);
-                alert('💀 Game Over! L\'ennemi t\'a vaincu!');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+    enemiesAttack() {
+        // Tous les ennemis vivants attaquent si adjacents
+        this.enemies.forEach(enemy => {
+            if (enemy.alive) {
+                const dx = Math.abs(this.hero.x - enemy.x);
+                const dy = Math.abs(this.hero.y - enemy.y);
+                
+                if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+                    this.hero.health--;
+                    this.updateHealthBar();
+                    this.draw();
+                    
+                    if (this.hero.health <= 0) {
+                        this.gameOver = true;
+                        clearInterval(this.enemyAttackInterval);
+                        alert('💀 Game Over! Les ennemis t\'ont vaincu!');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                }
             }
-        }
+        });
     }
     
     updateHealthBar() {
@@ -121,17 +137,19 @@ class Game {
         // Dessiner la gemme
         this.drawCharacter(this.gem.x, this.gem.y, this.gem.symbol);
         
-        // Dessiner l'ennemi vivant ou avec épée
-        if (this.enemy.alive || this.enemy.symbol === '⚔️') {
-            this.drawCharacter(this.enemy.x, this.enemy.y, this.enemy.symbol);
-            if (this.enemy.alive) {
-                this.drawEnemyHealth();
+        // Dessiner les ennemis vivants et morts avec épée
+        this.enemies.forEach(enemy => {
+            if (enemy.alive || enemy.symbol === '⚔️') {
+                this.drawCharacter(enemy.x, enemy.y, enemy.symbol);
+                if (enemy.alive) {
+                    this.drawHealthBar(enemy.x, enemy.y, enemy.health, enemy.maxHealth);
+                }
             }
-        }
+        });
         
         // Dessiner le héros
         this.drawCharacter(this.hero.x, this.hero.y, this.hero.symbol);
-        this.drawHeroHealth();
+        this.drawHealthBar(this.hero.x, this.hero.y, this.hero.health, this.hero.maxHealth);
     }
     
     drawGrid() {
@@ -187,14 +205,6 @@ class Game {
         this.ctx.fillRect(posX + 5, posY, barWidth * healthPercentage, barHeight);
     }
     
-    drawHeroHealth() {
-        this.drawHealthBar(this.hero.x, this.hero.y, this.hero.health, this.hero.maxHealth);
-    }
-    
-    drawEnemyHealth() {
-        this.drawHealthBar(this.enemy.x, this.enemy.y, this.enemy.health, this.enemy.maxHealth);
-    }
-    
     drawWall(x, y) {
         const posX = x * this.gridSize;
         const posY = y * this.gridSize;
@@ -210,6 +220,10 @@ class Game {
     
     isWall(x, y) {
         return this.walls.some(wall => wall.x === x && wall.y === y);
+    }
+    
+    areAllEnemiesDead() {
+        return this.enemies.every(enemy => !enemy.alive);
     }
 }
 
@@ -248,41 +262,46 @@ function addCommand(direction) {
             break;
     }
     
-    // Vérifier si la nouvelle position est valide (pas de mur et dans les limites)
+    // Vérifier si la nouvelle position est valide
     if (newX >= 0 && newX < game.cols && newY >= 0 && newY < game.rows && !game.isWall(newX, newY)) {
-        // Ne pas permettre de passer si l'ennemi est vivant et bloque le passage
-        if (game.enemy.alive && newX === game.enemy.x && newY === game.enemy.y) {
-            alert('⚠️ L\'ennemi bloque le passage! Tu dois le vaincre d\'abord!');
+        // Ne pas permettre de passer sur un ennemi vivant
+        const enemyAtPosition = game.enemies.find(enemy => 
+            enemy.alive && enemy.x === newX && enemy.y === newY
+        );
+        
+        if (enemyAtPosition) {
+            alert('⚠️ Un ennemi bloque le passage! Tu dois le vaincre d\'abord!');
             return;
         }
         
+        // Déplacer le héros
         game.hero.x = newX;
         game.hero.y = newY;
         
-        // Vérifier si le héros a atteint la gemme (seulement si l'ennemi est vaincu)
+        // Vérifier si on a atteint la gemme
         if (game.hero.x === game.gem.x && game.hero.y === game.gem.y) {
-            if (game.enemy.alive) {
-                alert('⚠️ Tu dois vaincre l\'ennemi avant de prendre la gemme!');
+            if (!game.areAllEnemiesDead()) {
+                alert('⚠️ Tu dois vaincre les 2 ennemis avant de prendre la gemme!');
             } else {
-                game.score += 200;
+                game.score += 300;
                 document.getElementById('score').textContent = game.score;
                 
                 clearInterval(game.enemyAttackInterval);
                 
                 // Sauvegarder la progression
-                localStorage.setItem('codecombat_level', '3');
+                localStorage.setItem('codecombat_level', '4');
                 localStorage.setItem('codecombat_score', game.score);
                 
-                // Marquer le niveau 2 comme complété
+                // Marquer le niveau 3 comme complété
                 let completed = JSON.parse(localStorage.getItem('codecombat_completed')) || [];
-                if (!completed.includes(2)) {
-                    completed.push(2);
+                if (!completed.includes(3)) {
+                    completed.push(3);
                     localStorage.setItem('codecombat_completed', JSON.stringify(completed));
                 }
                 
-                // Rediriger vers la page de victoire avec le score
+                // Rediriger vers la page de victoire
                 setTimeout(() => {
-                    window.location.href = 'victoire.html?score=' + game.score + '&level=2';
+                    window.location.href = 'victoire.html?score=' + game.score + '&level=3';
                 }, 500);
             }
         }
@@ -293,40 +312,55 @@ function addCommand(direction) {
 }
 
 function performAttack() {
-    if (!game.enemy.alive) {
-        alert('⚠️ Il n\'y a pas d\'ennemi à attaquer!');
+    // Chercher un ennemi vivant adjacent
+    let attackedEnemy = null;
+    
+    game.enemies.forEach(enemy => {
+        if (enemy.alive) {
+            const dx = Math.abs(game.hero.x - enemy.x);
+            const dy = Math.abs(game.hero.y - enemy.y);
+            
+            if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+                attackedEnemy = enemy;
+            }
+        }
+    });
+    
+    if (!attackedEnemy) {
+        alert('⚠️ Il n\'y a pas d\'ennemi à portée! Rapproche-toi d\'un ennemi pour l\'attaquer!');
         return;
     }
     
-    // Vérifier si l'ennemi est adjacent au héros
-    const dx = Math.abs(game.hero.x - game.enemy.x);
-    const dy = Math.abs(game.hero.y - game.enemy.y);
+    attackedEnemy.health--;
     
-    if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-        game.enemy.health--;
+    if (attackedEnemy.health <= 0) {
+        attackedEnemy.alive = false;
+        game.score += 75;
+        document.getElementById('score').textContent = game.score;
         
-        if (game.enemy.health <= 0) {
-            game.enemy.alive = false;
-            clearInterval(game.enemyAttackInterval);
-            game.score += 50;
-            document.getElementById('score').textContent = game.score;
-            
-            // Afficher l'épée qui tranche
-            const enemyX = game.enemy.x;
-            const enemyY = game.enemy.y;
-            game.enemy.symbol = '⚔️';
-            
+        // Afficher l'épée qui tranche à la position de l'ennemi
+        const enemyX = attackedEnemy.x;
+        const enemyY = attackedEnemy.y;
+        attackedEnemy.symbol = '⚔️';
+        
+        game.draw();
+        
+        // Attendre un peu puis faire disparaître l'ennemi
+        setTimeout(() => {
+            // Trouver l'ennemi et le faire disparaître
+            const enemy = game.enemies.find(e => e.x === enemyX && e.y === enemyY);
+            if (enemy) {
+                enemy.symbol = '';
+            }
             game.draw();
             
-            // Faire disparaître l'épée après 500ms
-            setTimeout(() => {
-                game.enemy.symbol = '';
-                game.draw();
-            }, 500);
-        } else {
-            game.draw();
-        }
+            if (game.areAllEnemiesDead()) {
+                clearInterval(game.enemyAttackInterval);
+                game.score += 150;
+                document.getElementById('score').textContent = game.score;
+            }
+        }, 500);
     } else {
-        alert('⚠️ Tu es trop loin! Rapproche-toi de l\'ennemi pour l\'attaquer!');
+        game.draw();
     }
 }
