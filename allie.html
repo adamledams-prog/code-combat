@@ -178,15 +178,38 @@
         <h1>Ton Allié</h1>
         <p class="subtitle">Nouveau personnage débloqué !</p>
 
-        <div class="items-grid">
-            <div class="item-card">
-                <div class="item-icon">🪓</div>
-                <div class="item-name">Épée en Bois</div>
-                <div class="item-status">NOUVEAU</div>
-            </div>
-        </div>
+        <div class="items-grid" id="items-grid"></div>
 
         <a href="accueil.html" class="back-button">🏠 Retour à l'Accueil</a>
     </div>
+
+    <script>
+        // Vérifier si l'arc est débloqué
+        const hasAllyBow = localStorage.getItem('codecombat_ally_bow') === 'true';
+        const itemsGrid = document.getElementById('items-grid');
+
+        // Toujours afficher l'épée de base
+        const swordCard = document.createElement('div');
+        swordCard.className = 'item-card';
+        swordCard.innerHTML = `
+            <div class="item-icon">⚔️</div>
+            <div class="item-name">Épée de Base</div>
+            <div class="item-status">ÉQUIPÉ</div>
+        `;
+        itemsGrid.appendChild(swordCard);
+
+        // Afficher l'arc si débloqué
+        if (hasAllyBow) {
+            const bowCard = document.createElement('div');
+            bowCard.className = 'item-card';
+            bowCard.innerHTML = `
+                <div class="item-icon">🏹</div>
+                <div class="item-name">Arc Puissant</div>
+                <div class="item-status">✓ DÉBLOQUÉ</div>
+            `;
+            bowCard.style.marginLeft = '30px';
+            itemsGrid.appendChild(bowCard);
+        }
+    </script>
 </body>
 </html>

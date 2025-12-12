@@ -218,10 +218,17 @@
             </div>
         </div>
         
-        <div id="ally-button-container" style="margin-top: 40px; display: none;">
-            <a href="allie.html" class="play-button" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 0.8em; padding: 20px 50px;">
-                👨 TON ALLIÉ
-            </a>
+        <div style="margin-top: 40px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <div id="hero-button-container" style="display: none;">
+                <a href="perso.html" class="play-button" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); font-size: 0.8em; padding: 20px 50px;">
+                    🦸 VOIR TON PERSO
+                </a>
+            </div>
+            <div id="ally-button-container" style="display: none;">
+                <a href="allie.html" class="play-button" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 0.8em; padding: 20px 50px;">
+                    👨 TON ALLIÉ
+                </a>
+            </div>
         </div>
     </div>
     
@@ -233,6 +240,11 @@
         
         // Toujours rediriger vers la carte des niveaux
         playButton.href = 'carte.html';
+        
+        // Débloquer le bouton "Voir ton perso" si le niveau 1 est complété
+        if (completedLevels.includes(1)) {
+            document.getElementById('hero-button-container').style.display = 'block';
+        }
         
         // Débloquer le bouton "Allié" si le niveau 4 est complété
         if (completedLevels.includes(4)) {

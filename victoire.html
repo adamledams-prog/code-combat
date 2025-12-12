@@ -132,6 +132,14 @@
         const score = urlParams.get('score') || 100;
         const level = urlParams.get('level') || '1';
         document.getElementById('final-score').textContent = score;
+        
+        // Débloquer des items spéciaux selon le niveau complété
+        if (level === '9') {
+            // Débloquer l'épée puissante et l'arc pour l'allié
+            localStorage.setItem('codecombat_powerful_sword', 'true');
+            localStorage.setItem('codecombat_ally_bow', 'true');
+            alert('🎉 Objets débloqués!\n\n⚔️ Épée Puissante : Inflige 2 dégâts aux ennemis!\n🏹 Arc de l\'Allié : Ton allié peut attaquer à distance!');
+        }
     </script>
 </body>
 </html>

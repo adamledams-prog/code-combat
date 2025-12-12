@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Combat - Mon Perso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            color: white;
+            animation: fadeIn 0.8s ease-in;
+            max-width: 1000px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-avatar {
+            font-size: 8em;
+            margin-bottom: 30px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 50px;
+            padding: 20px;
+        }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 40px 30px;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(66, 153, 225, 0.3), rgba(49, 130, 206, 0.3));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .item-card.unlocked::before {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.3), rgba(56, 161, 105, 0.3));
+        }
+
+        .item-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(66, 153, 225, 0.5);
+            border-color: #4299e1;
+        }
+
+        .item-card.unlocked:hover {
+            box-shadow: 0 15px 40px rgba(72, 187, 120, 0.5);
+            border-color: #48bb78;
+        }
+
+        .item-card:hover::before {
+            opacity: 1;
+        }
+
+        .item-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .item-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .item-status {
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .item-status.unlocked {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .item-status.locked {
+            background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .item-unlock-level {
+            font-size: 0.9em;
+            margin-top: 10px;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            padding: 20px 50px;
+            font-size: 1.8em;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: 3px solid rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(66, 153, 225, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero-avatar">🦸</div>
+        <h1>Mon Perso</h1>
+        <p class="subtitle">Équipement débloqué</p>
+
+        <div class="items-grid" id="items-grid"></div>
+
+        <a href="accueil.html" class="back-button">🏠 Retour à l'Accueil</a>
+    </div>
+
+    <script>
+        // Équipements à débloquer
+        const equipment = [
+            {
+                id: 'epee',
+                name: 'Épée',
+                icon: '⚔️',
+                unlockLevel: 1,
+                description: 'Inflige 1 dégât'
+            },
+            {
+                id: 'hache',
+                name: 'Hache',
+                icon: '🪓',
+                unlockLevel: 4,
+                description: 'Casse les murs de bois'
+            },
+            {
+                id: 'armure',
+                name: 'Armure',
+                icon: '🛡️',
+                unlockLevel: 6,
+                description: '+1 PV maximum'
+            },
+            {
+                id: 'epee_puissante',
+                name: 'Épée Puissante',
+                icon: '⚔️',
+                unlockLevel: 9,
+                specialUnlock: 'codecombat_powerful_sword',
+                description: 'Inflige 2 dégâts!'
+            }
+        ];
+
+        // Récupérer les niveaux complétés et items spéciaux
+        const completedLevels = JSON.parse(localStorage.getItem('codecombat_completed')) || [];
+        const itemsGrid = document.getElementById('items-grid');
+
+        // Créer les cartes d'équipement
+        equipment.forEach(item => {
+            const itemCard = document.createElement('div');
+            
+            // Vérifier si l'équipement est débloqué
+            let isUnlocked;
+            if (item.specialUnlock) {
+                isUnlocked = localStorage.getItem(item.specialUnlock) === 'true';
+            } else {
+                isUnlocked = completedLevels.includes(item.unlockLevel);
+            }
+            
+            itemCard.className = `item-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+            itemCard.innerHTML = `
+                <div class="item-icon">${item.icon}</div>
+                <div class="item-name">${item.name}</div>
+                <div class="item-status ${isUnlocked ? 'unlocked' : 'locked'}">
+                    ${isUnlocked ? '✓ DÉBLOQUÉ' : '🔒 VERROUILLÉ'}
+                </div>
+                <div class="item-unlock-level">
+                    ${isUnlocked ? `Débloqué au niveau ${item.unlockLevel}` : `Se débloque au niveau ${item.unlockLevel}`}
+                </div>
+                ${item.description ? `<div class="item-unlock-level" style="margin-top: 5px; font-style: italic;">${item.description}</div>` : ''}
+            `;
+            
+            itemsGrid.appendChild(itemCard);
+        });
+    </script>
+</body>
+</html>

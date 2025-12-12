@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Combat - Niveau 6</title>
+    <link rel="stylesheet" href="niveau.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <a href="carte.html" class="home-btn" title="Retour à la carte">🗺️</a>
+                <h1>🎮 Code Combat - Niveau 6</h1>
+            </div>
+            <div class="level-info">
+                <span>Score: <span id="score">0</span></span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Zone de jeu -->
+            <div class="game-area">
+                <h2>Terrain de Combat</h2>
+                <canvas id="game-canvas" width="600" height="400"></canvas>
+            </div>
+
+            <!-- Panneau de commandes -->
+            <div class="controls-area">
+                <h2>Commandes</h2>
+                <div class="health-bar-container">
+                    <div class="health-label">❤️ Vie:</div>
+                    <div class="health-bar">
+                        <div class="health-fill" id="hero-health"></div>
+                    </div>
+                    <span class="health-text"><span id="health-value">3</span>/3</span>
+                </div>
+                <div class="command-buttons">
+                    <button class="cmd-btn" onclick="addCommand('haut')">⬆️ En Haut</button>
+                    <button class="cmd-btn" onclick="addCommand('bas')">⬇️ En Bas</button>
+                    <button class="cmd-btn" onclick="addCommand('gauche')">⬅️ À Gauche</button>
+                    <button class="cmd-btn" onclick="addCommand('droite')">➡️ À Droite</button>
+                    <button class="cmd-btn cmd-attack" onclick="addCommand('attaque')">⚔️ Attaquer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="niveau6.js"></script>
+</body>
+</html>

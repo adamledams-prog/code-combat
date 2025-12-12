@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialisation - Code Combat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .reset-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        p {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .success {
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="reset-container">
+        <div class="success">✅</div>
+        <h1>Progression réinitialisée !</h1>
+        <p>Votre progression a été réinitialisée au début du jeu.</p>
+        <p>Vous êtes maintenant au niveau 1, sans allié.</p>
+        <a href="accueil.html" class="button">Retour à l'accueil</a>
+    </div>
+
+    <script>
+        // Réinitialiser la progression
+        localStorage.setItem('codecombat_level', '1');
+        localStorage.setItem('codecombat_score', '0');
+        localStorage.setItem('codecombat_completed', JSON.stringify([]));
+        
+        console.log('Progression réinitialisée :');
+        console.log('Niveau actuel : 1');
+        console.log('Score total : 0');
+        console.log('Niveaux complétés : aucun');
+    </script>
+</body>
+</html>
