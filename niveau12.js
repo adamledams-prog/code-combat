@@ -1,4 +1,4 @@
-// Code Combat - Niveau 10 - Libération de l'Allié
+// Code Combat - Niveau 12 - Portail et Rivière
 class Game {
     constructor() {
         this.canvas = document.getElementById('game-canvas');
@@ -12,26 +12,27 @@ class Game {
         this.score = parseInt(urlParams.get('score')) || 0;
         document.getElementById('score').textContent = this.score;
         
+        // Héros spawne en haut à droite, bloqué
         this.hero = {
-            x: 1,
+            x: 10,
             y: 1,
             symbol: '🦸',
-            health: 4,
-            maxHealth: 4
+            health: 5,
+            maxHealth: 5
         };
         
-        // Allié enfermé en bas à gauche
+        // Allié derrière le portail
         this.ally = {
-            x: 2,
-            y: 5,
+            x: 3,
+            y: 1,
             symbol: '👨',
-            freed: false
+            canShoot: true
         };
         
-        // Ennemi avant la rivière
+        // Ennemi que l'allié doit tuer
         this.enemy = {
             x: 5,
-            y: 5,
+            y: 3,
             symbol: '👹',
             health: 1,
             maxHealth: 1,
@@ -48,27 +49,45 @@ class Game {
             alive: true
         };
         
-        // Blocs de bois (prison de l'allié) - 4 blocs autour
-        this.woodWalls = [
-            {x: 1, y: 5, destroyed: false},
-            {x: 2, y: 4, destroyed: false},
-            {x: 2, y: 6, destroyed: false},
-            {x: 3, y: 5, destroyed: false}
-        ];
+        // Portail rouge (derrière un mur)
+        this.portal = {
+            x: 1,
+            y: 1,
+            symbol: '🔴'
+        };
         
-        // Blocs de construction
+        // Blocs pour traverser la rivière
         this.blocks = [];
         
-        // Murs fixes
+        this.placedBlocks = [];
+        
+        // Murs
         this.walls = [
             // Cadre extérieur
             {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0}, {x: 4, y: 0}, {x: 5, y: 0}, {x: 6, y: 0}, {x: 7, y: 0}, {x: 8, y: 0}, {x: 9, y: 0}, {x: 10, y: 0}, {x: 11, y: 0},
             {x: 0, y: 1}, {x: 0, y: 2}, {x: 0, y: 3}, {x: 0, y: 4}, {x: 0, y: 5}, {x: 0, y: 6}, {x: 0, y: 7},
             {x: 11, y: 1}, {x: 11, y: 2}, {x: 11, y: 3}, {x: 11, y: 4}, {x: 11, y: 5}, {x: 11, y: 6}, {x: 11, y: 7},
-            {x: 1, y: 7}, {x: 2, y: 7}, {x: 3, y: 7}, {x: 4, y: 7}, {x: 5, y: 7}, {x: 6, y: 7}, {x: 7, y: 7}, {x: 8, y: 7}, {x: 9, y: 7}, {x: 10, y: 7}
+            {x: 1, y: 7}, {x: 2, y: 7}, {x: 3, y: 7}, {x: 4, y: 7}, {x: 5, y: 7}, {x: 6, y: 7}, {x: 7, y: 7}, {x: 8, y: 7}, {x: 9, y: 7}, {x: 10, y: 7},
+            
+            // Murs qui enferment complètement le héros en haut à droite (10, 1)
+            {x: 9, y: 0},  // Déjà dans le cadre mais on le garde
+            {x: 9, y: 1},  // Gauche
+            {x: 9, y: 2},  // Bas-gauche
+            {x: 10, y: 2}, // Bas
+            {x: 11, y: 1}, // Droite (déjà dans le cadre)
+            {x: 10, y: 0}, // Haut (déjà dans le cadre)
+            
+            // Mur qui cache le portail rouge et à gauche de l'allié
+            {x: 2, y: 1},
+            // Mur en dessous de l'allié
+            {x: 3, y: 2},
+            
+            // Autres murs du labyrinthe
+            {x: 4, y: 1}, {x: 4, y: 2}, {x: 4, y: 3},
+            {x: 6, y: 1}, {x: 6, y: 2}
         ];
         
-        // Rivière (toute la hauteur)
+        // Rivière verticale
         this.water = [];
         for (let y = 1; y <= 6; y++) {
             this.water.push({x: 7, y: y});
@@ -77,14 +96,12 @@ class Game {
         // Gemme à atteindre
         this.gem = {
             x: 10,
-            y: 3,
+            y: 6,
             symbol: '💎'
         };
         
         this.gameOver = false;
-        this.allyCanShoot = false;
-        this.canPlaceBlock = false;
-        this.placedBlocks = [];
+        this.hasUsedPortal = false;
         
         this.startAlienAttacks();
         
@@ -98,7 +115,7 @@ class Game {
             if (this.alien.alive && !this.gameOver) {
                 this.alienAttack();
             }
-        }, 2000);
+        }, 1700);
     }
     
     alienAttack() {
@@ -107,42 +124,48 @@ class Game {
         const dy = Math.abs(this.hero.y - this.alien.y);
         
         if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-            this.hero.health--;
+            this.hero.health = 0;
             this.updateHealthBar();
             this.draw();
             
-            if (this.hero.health <= 0) {
-                this.gameOver = true;
-                clearInterval(this.alienAttackInterval);
-                alert('💀 Game Over! L\'alien t\'a vaincu!');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            }
+            this.gameOver = true;
+            clearInterval(this.alienAttackInterval);
+            alert('💀 Game Over! L\'alien t\'a tué en 1,7s!');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         }
     }
     
     updateButtons() {
-        const btnCasser = document.getElementById('btn-casser');
+        const btnPortail = document.getElementById('btn-portail');
         const btnFleche = document.getElementById('btn-fleche');
+        const btnCasser = document.getElementById('btn-casser');
         const btnPoser = document.getElementById('btn-poser');
         
-        // Bouton Casser Bois visible au début
-        if (this.woodWalls.some(w => !w.destroyed)) {
-            btnCasser.style.display = 'block';
+        // Bouton Portail visible au début
+        if (!this.hasUsedPortal) {
+            btnPortail.style.display = 'block';
         } else {
-            btnCasser.style.display = 'none';
+            btnPortail.style.display = 'none';
         }
         
-        // Bouton Lancer Flèche visible après libération de l'allié
-        if (this.ally.freed && this.enemy.alive) {
+        // Bouton Flèche visible après utilisation du portail et si l'allié peut encore tirer
+        if (this.hasUsedPortal && this.ally.canShoot) {
             btnFleche.style.display = 'block';
         } else {
             btnFleche.style.display = 'none';
         }
         
+        // Bouton Casser Block visible après que la flèche a tué l'ennemi
+        if (this.hasUsedPortal && !this.ally.canShoot && !this.enemy.alive) {
+            btnCasser.style.display = 'block';
+        } else {
+            btnCasser.style.display = 'none';
+        }
+        
         // Bouton Poser Bloc visible après avoir tué l'ennemi
-        if (this.ally.freed && !this.enemy.alive) {
+        if (this.hasUsedPortal && !this.enemy.alive) {
             btnPoser.style.display = 'block';
         } else {
             btnPoser.style.display = 'none';
@@ -170,16 +193,9 @@ class Game {
         
         this.drawGrid();
         
-        // Dessiner les murs fixes
+        // Dessiner les murs
         this.walls.forEach(wall => {
             this.drawWall(wall.x, wall.y);
-        });
-        
-        // Dessiner les murs de bois
-        this.woodWalls.forEach(wall => {
-            if (!wall.destroyed) {
-                this.drawWoodWall(wall.x, wall.y);
-            }
         });
         
         // Dessiner la rivière
@@ -198,6 +214,9 @@ class Game {
                 this.drawCharacter(block.x, block.y, block.symbol);
             }
         });
+        
+        // Dessiner le portail rouge
+        this.drawPortal(this.portal.x, this.portal.y, this.portal.symbol);
         
         // Dessiner la gemme
         this.drawCharacter(this.gem.x, this.gem.y, this.gem.symbol);
@@ -282,22 +301,6 @@ class Game {
         this.ctx.strokeRect(posX, posY, this.gridSize, this.gridSize);
     }
     
-    drawWoodWall(x, y) {
-        const posX = x * this.gridSize;
-        const posY = y * this.gridSize;
-        
-        this.ctx.fillStyle = '#8b4513';
-        this.ctx.fillRect(posX, posY, this.gridSize, this.gridSize);
-        
-        this.ctx.strokeStyle = '#654321';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(posX, posY, this.gridSize, this.gridSize);
-        
-        // Texture bois
-        this.ctx.fillStyle = '#a0522d';
-        this.ctx.fillRect(posX + 5, posY + 5, this.gridSize - 10, this.gridSize - 10);
-    }
-    
     drawWater(x, y) {
         const posX = x * this.gridSize;
         const posY = y * this.gridSize;
@@ -321,16 +324,30 @@ class Game {
         this.ctx.strokeRect(posX, posY, this.gridSize, this.gridSize);
     }
     
+    drawPortal(x, y, symbol) {
+        const centerX = x * this.gridSize + this.gridSize / 2;
+        const centerY = y * this.gridSize + this.gridSize / 2;
+        
+        // Aura du portail
+        const gradient = this.ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, 20);
+        gradient.addColorStop(0, 'rgba(255, 0, 0, 0.3)');
+        gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(x * this.gridSize, y * this.gridSize, this.gridSize, this.gridSize);
+        
+        // Symbole du portail
+        this.ctx.font = '30px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(symbol, centerX, centerY);
+    }
+    
     isWall(x, y) {
-        if (this.walls.some(wall => wall.x === x && wall.y === y)) {
-            return true;
-        }
-        // Vérifier les murs de bois non détruits
-        return this.woodWalls.some(wall => !wall.destroyed && wall.x === x && wall.y === y);
+        return this.walls.some(wall => wall.x === x && wall.y === y);
     }
     
     isWater(x, y) {
-        // Vérifier si un bloc a été placé ici
         if (this.placedBlocks.some(block => block.x === x && block.y === y)) {
             return false;
         }
@@ -350,13 +367,18 @@ function addCommand(direction) {
     
     console.log('Commande:', direction);
     
-    if (direction === 'casser') {
-        breakWood();
+    if (direction === 'portail') {
+        usePortal();
         return;
     }
     
     if (direction === 'fleche') {
         allyShootArrow();
+        return;
+    }
+    
+    if (direction === 'casser') {
+        breakBlock();
         return;
     }
     
@@ -401,34 +423,33 @@ function addCommand(direction) {
                 block.picked = true;
                 game.score += 20;
                 document.getElementById('score').textContent = game.score;
-                alert('🧱 Bloc ramassé!');
             }
         });
         
         // Vérifier si on atteint la gemme
         if (game.hero.x === game.gem.x && game.hero.y === game.gem.y) {
-            if (!game.enemy.alive && !game.alien.alive) {
-                game.score += 1000;
+            if (!game.alien.alive) {
+                game.score += 1500;
                 document.getElementById('score').textContent = game.score;
                 
                 game.gameOver = true;
                 clearInterval(game.alienAttackInterval);
                 
                 // Sauvegarder la progression
-                localStorage.setItem('codecombat_level', '11');
+                localStorage.setItem('codecombat_level', '13');
                 localStorage.setItem('codecombat_score', game.score);
                 
                 let completed = JSON.parse(localStorage.getItem('codecombat_completed')) || [];
-                if (!completed.includes(10)) {
-                    completed.push(10);
+                if (!completed.includes(12)) {
+                    completed.push(12);
                     localStorage.setItem('codecombat_completed', JSON.stringify(completed));
                 }
                 
                 setTimeout(() => {
-                    window.location.href = 'victoire.html?score=' + game.score + '&level=10';
+                    window.location.href = 'victoire.html?score=' + game.score + '&level=12';
                 }, 500);
             } else {
-                alert('⚠️ L\'ennemi ET l\'alien doivent être morts!');
+                alert('⚠️ L\'alien doit être mort!');
             }
         }
     }
@@ -436,74 +457,77 @@ function addCommand(direction) {
     game.draw();
 }
 
-function breakWood() {
-    // Trouver le mur de bois adjacent au héros
-    const positions = [
-        {x: game.hero.x + 1, y: game.hero.y},
-        {x: game.hero.x - 1, y: game.hero.y},
-        {x: game.hero.x, y: game.hero.y + 1},
-        {x: game.hero.x, y: game.hero.y - 1}
-    ];
-    
-    let broken = false;
-    for (let pos of positions) {
-        const wall = game.woodWalls.find(w => !w.destroyed && w.x === pos.x && w.y === pos.y);
-        if (wall) {
-            wall.destroyed = true;
-            game.score += 50;
-            document.getElementById('score').textContent = game.score;
-            broken = true;
-            
-            // Un seul mur cassé suffit pour libérer l'allié
-            game.ally.freed = true;
-            alert('🪵 Mur cassé! 👨 Allié libéré! +50 points! Utilise le bouton "Lancer Flèche" pour que ton allié tire!');
-            game.updateButtons();
-            break;
-        }
+function usePortal() {
+    if (game.hasUsedPortal) {
+        alert('⚠️ Tu as déjà utilisé le portail!');
+        return;
     }
     
-    if (!broken) {
-        alert('⚠️ Aucun mur de bois adjacent à casser!');
-    }
+    // Téléporter le héros au portail rouge
+    game.hero.x = game.portal.x;
+    game.hero.y = game.portal.y;
+    game.hasUsedPortal = true;
+    game.score += 100;
+    document.getElementById('score').textContent = game.score;
     
     game.updateButtons();
     game.draw();
 }
 
 function allyShootArrow() {
-    if (!game.ally.freed) {
-        alert('⚠️ L\'allié ne peut pas tirer!');
+    if (!game.enemy.alive) {
+        alert('⚠️ L\'ennemi est déjà mort!');
         return;
     }
     
-    // Choisir la cible : ennemi ou alien
-    let target = null;
-    if (game.enemy.alive) {
-        target = game.enemy;
-    } else if (game.alien.alive) {
-        target = game.alien;
-    } else {
-        alert('⚠️ Tous les ennemis sont morts!');
+    if (!game.ally.canShoot) {
+        alert('⚠️ L\'allié a déjà tiré!');
         return;
     }
+    
+    // L'allié tire la flèche
+    game.ally.canShoot = false;
+    
+    // Mettre à jour les boutons immédiatement
+    game.updateButtons();
     
     // Animation de la flèche
-    drawArrowAnimation(game.ally.x, game.ally.y, target.x, target.y, () => {
-        // L'allié tue la cible
-        target.health = 0;
-        target.alive = false;
-        game.score += 100;
+    drawArrowAnimation(game.ally.x, game.ally.y, game.enemy.x, game.enemy.y, () => {
+        // La flèche tue l'ennemi
+        game.enemy.health = 0;
+        game.enemy.alive = false;
+        game.score += 200;
         document.getElementById('score').textContent = game.score;
-        
-        if (target === game.enemy) {
-            alert('🏹 L\'allié a tué l\'ennemi! +100 points!');
-        } else {
-            alert('🏹 L\'allié a tué l\'alien! +100 points!');
-        }
         
         game.updateButtons();
         game.draw();
     });
+}
+
+function breakBlock() {
+    // Casser les blocs autour de l'allié pour le libérer
+    const blocksToRemove = [
+        {x: 2, y: 1}, // Gauche
+        {x: 3, y: 2}  // Bas
+    ];
+    
+    let blocksRemoved = 0;
+    blocksToRemove.forEach(pos => {
+        const index = game.walls.findIndex(wall => wall.x === pos.x && wall.y === pos.y);
+        if (index !== -1) {
+            game.walls.splice(index, 1);
+            blocksRemoved++;
+        }
+    });
+    
+    if (blocksRemoved > 0) {
+        game.score += 50;
+        document.getElementById('score').textContent = game.score;
+        alert('🪓 Blocs cassés! L\'allié est libéré!');
+    }
+    
+    game.updateButtons();
+    game.draw();
 }
 
 function drawArrowAnimation(startX, startY, endX, endY, callback) {
@@ -552,7 +576,6 @@ function placeBlock() {
             game.placedBlocks.push({x: pos.x, y: pos.y});
             game.score += 30;
             document.getElementById('score').textContent = game.score;
-            alert('🧱 Bloc posé sur l\'eau! +30 points!');
             placed = true;
             break;
         }
@@ -566,19 +589,19 @@ function placeBlock() {
 }
 
 function performAttack() {
-    // Vérifier si l'alien est adjacent
-    const dx = Math.abs(game.hero.x - game.alien.x);
-    const dy = Math.abs(game.hero.y - game.alien.y);
-    
     if (!game.alien.alive) {
         alert('⚠️ L\'alien est déjà mort!');
         return;
     }
     
+    // Vérifier si l'alien est adjacent
+    const dx = Math.abs(game.hero.x - game.alien.x);
+    const dy = Math.abs(game.hero.y - game.alien.y);
+    
     if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
         // Attaquer l'alien
         game.alien.health--;
-        game.score += 50;
+        game.score += 100;
         document.getElementById('score').textContent = game.score;
         
         if (game.alien.health <= 0) {
