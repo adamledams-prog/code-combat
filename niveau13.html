@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Combat - Niveau 13</title>
+    <link rel="stylesheet" href="niveau.css">
+    <style>
+        .potion-selection {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .potion-selection h2 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .potion-selection p {
+            color: #ffd700;
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .potions-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .potion-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            width: 150px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .potion-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.3);
+        }
+
+        .potion-card.red {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .potion-card.red:hover {
+            box-shadow: 0 15px 40px rgba(239, 68, 68, 0.5);
+        }
+
+        .potion-card.blue {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .potion-card.blue:hover {
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
+        }
+
+        .potion-card.green {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .potion-card.green:hover {
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+        }
+
+        .potion-card.yellow {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.2);
+        }
+
+        .potion-card.yellow:hover {
+            box-shadow: 0 15px 40px rgba(251, 191, 36, 0.5);
+        }
+
+        .potion-card.purple {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.2);
+        }
+
+        .potion-card.purple:hover {
+            box-shadow: 0 15px 40px rgba(168, 85, 247, 0.5);
+        }
+
+        .potion-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .potion-name {
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .btn-potion {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+        }
+
+        .btn-potion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5);
+        }
+
+        .btn-potion:disabled {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Écran de sélection de potion -->
+    <div id="potion-selection" class="potion-selection">
+        <h2>⚗️ Choisis Ta Potion ⚗️</h2>
+        <p>Tu es face à un ennemi mystérieux enfermé dans une cage ! 🧟<br>
+        Une seule potion peut le détruire... Choisis sagement !</p>
+        <div class="potions-container">
+            <div class="potion-card red" onclick="selectPotion('red')">
+                <div class="potion-icon">🧪</div>
+                <div class="potion-name">Rouge</div>
+            </div>
+            <div class="potion-card blue" onclick="selectPotion('blue')">
+                <div class="potion-icon">🧪</div>
+                <div class="potion-name">Bleue</div>
+            </div>
+            <div class="potion-card green" onclick="selectPotion('green')">
+                <div class="potion-icon">🧪</div>
+                <div class="potion-name">Verte</div>
+            </div>
+            <div class="potion-card yellow" onclick="selectPotion('yellow')">
+                <div class="potion-icon">🧪</div>
+                <div class="potion-name">Jaune</div>
+            </div>
+            <div class="potion-card purple" onclick="selectPotion('purple')">
+                <div class="potion-icon">🧪</div>
+                <div class="potion-name">Violette</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interface du jeu -->
+    <div id="game-interface" class="container hidden">
+        <header>
+            <div class="header-left">
+                <a href="carte.html" class="home-btn" title="Retour à la carte">🗺️</a>
+                <h1>🎮 Code Combat - Niveau 13</h1>
+            </div>
+            <div class="level-info">
+                <span>Score: <span id="score">0</span></span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Zone de jeu -->
+            <div class="game-area">
+                <h2>L'Énigme des Potions</h2>
+                <canvas id="game-canvas" width="600" height="400"></canvas>
+                
+                <!-- Barre de vie -->
+                <div class="health-bar-container">
+                    <div class="health-label">❤️ Vie:</div>
+                    <div class="health-bar">
+                        <div id="health-fill" class="health-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panneau de commandes -->
+            <div class="controls-area">
+                <h2>🎯 Objectif</h2>
+                <div class="objective-box">
+                    <p>Tu es enfermé avec un ennemi mystérieux ! 🧟</p>
+                    <p>Utilise ta potion pour le détruire et t'échapper !</p>
+                    <p style="color: #fbbf24;">⚠️ Attention : Une mauvaise potion te tuera !</p>
+                </div>
+
+                <h2>Commandes</h2>
+                <div class="command-buttons">
+                    <button id="btn-potion" class="btn-potion" onclick="usePotion()">
+                        🧪 Utiliser la Potion
+                    </button>
+                </div>
+
+                <div class="info-panel">
+                    <h3>📋 Instructions</h3>
+                    <p>1. Tu as choisi une potion</p>
+                    <p>2. Clique sur "Utiliser la Potion"</p>
+                    <p>3. Si c'est la bonne, l'ennemi meurt et tu t'échappes !</p>
+                    <p>4. Si c'est la mauvaise... 💀</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="niveau13.js"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Combat - Niveau 14 - BOSS FINAL</title>
+    <link rel="stylesheet" href="niveau.css">
+    <style>
+        .boss-title {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(239, 68, 68, 0.8);
+            }
+        }
+
+        .boss-title h2 {
+            color: white;
+            font-size: 2em;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .phase-indicator {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .phase-indicator h3 {
+            color: #fbbf24;
+            margin: 0;
+            font-size: 1.3em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <a href="carte.html" class="home-btn" title="Retour à la carte">🗺️</a>
+                <h1>🎮 Code Combat - Niveau 14</h1>
+            </div>
+            <div class="level-info">
+                <span>Score: <span id="score">0</span></span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Zone de jeu -->
+            <div class="game-area">
+                <div class="boss-title">
+                    <h2>👑 BOSS FINAL 👑</h2>
+                </div>
+                <canvas id="game-canvas" width="600" height="400"></canvas>
+                
+
+            </div>
+
+            <!-- Panneau de commandes -->
+            <div class="controls-area">
+                <div class="phase-indicator">
+                    <h3 id="phase-title">Phase 1/5</h3>
+                </div>
+
+                <h2>Commandes</h2>
+                <div class="health-bar-container">
+                    <div class="health-label">❤️ Vie:</div>
+                    <div class="health-bar">
+                        <div class="health-fill" id="hero-health"></div>
+                    </div>
+                    <span class="health-text"><span id="health-value">6</span>/6</span>
+                </div>
+                
+                <div class="command-buttons" id="command-buttons">
+                    <button class="cmd-btn" onclick="moveHero('haut')">⬆️ En Haut</button>
+                    <button class="cmd-btn" onclick="moveHero('bas')">⬇️ En Bas</button>
+                    <button class="cmd-btn" onclick="moveHero('gauche')">⬅️ À Gauche</button>
+                    <button class="cmd-btn" onclick="moveHero('droite')">➡️ À Droite</button>
+                    <button class="cmd-btn" onclick="usePortal()" id="btn-portail">🔴 Portail</button>
+                    <button class="cmd-btn" onclick="allyShoot()" id="btn-fleche" style="display:none;">🏹 Lancer Flèche</button>
+                    <button class="cmd-btn" onclick="placeBlock()" id="btn-poser" style="display:none;">🧱 Poser Bloc</button>
+                    <button class="cmd-btn cmd-attack" onclick="attackEnemy()" id="btn-attaque" style="display:none;">⚔️ Attaquer</button>
+                </div>
+
+                <div class="info-panel">
+                    <h3>📋 Boss Final</h3>
+                    <p id="info-text">Utilise toutes tes compétences pour vaincre le boss !</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="niveau14.js"></script>
+</body>
+</html>

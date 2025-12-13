@@ -445,8 +445,11 @@ function addCommand(direction) {
                     localStorage.setItem('codecombat_completed', JSON.stringify(completed));
                 }
                 
+                // Passer au niveau 13
+                localStorage.setItem('codecombat_level', 13);
+                
                 setTimeout(() => {
-                    window.location.href = 'victoire.html?score=' + game.score + '&level=12';
+                    window.location.href = `niveau13.html?score=${game.score}`;
                 }, 500);
             } else {
                 alert('⚠️ L\'alien doit être mort!');
