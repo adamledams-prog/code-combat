@@ -5,6 +5,265 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Combat - Niveau 1</title>
     <link rel="stylesheet" href="niveau.css">
+    <style>
+        /* Effet arc-en-ciel sur tout le fond violet */
+        body {
+            background: linear-gradient(
+                135deg,
+                #667eea 0%,
+                #764ba2 25%,
+                #667eea 50%,
+                #764ba2 75%,
+                #667eea 100%
+            );
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Overlay arc-en-ciel subtil qui se déplace */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(255, 0, 0, 0.15) 10%,
+                rgba(255, 154, 0, 0.15) 15%,
+                rgba(208, 222, 33, 0.15) 20%,
+                rgba(79, 220, 74, 0.15) 25%,
+                rgba(63, 218, 216, 0.15) 30%,
+                rgba(47, 201, 226, 0.15) 35%,
+                rgba(28, 127, 238, 0.15) 40%,
+                rgba(95, 21, 242, 0.15) 45%,
+                transparent 50%,
+                transparent 100%
+            );
+            animation: rainbow-sweep 10s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes rainbow-sweep {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Deuxième couche d'arc-en-ciel */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.1) 0%,
+                rgba(255, 154, 0, 0.1) 14%,
+                rgba(208, 222, 33, 0.1) 28%,
+                rgba(79, 220, 74, 0.1) 42%,
+                rgba(63, 218, 216, 0.1) 56%,
+                rgba(47, 201, 226, 0.1) 70%,
+                rgba(28, 127, 238, 0.1) 84%,
+                rgba(95, 21, 242, 0.1) 100%
+            );
+            background-size: 200% 100%;
+            animation: rainbow-slide 8s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes rainbow-slide {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 200% 0%;
+            }
+        }
+
+        /* Effet arc-en-ciel sur le container - fond blanc qui change de couleur */
+        .container {
+            position: relative;
+            z-index: 1;
+            animation: container-color-change 10s linear infinite, container-glow 3s ease-in-out infinite alternate;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2),
+                        0 0 60px rgba(138, 43, 226, 0.3);
+        }
+
+        @keyframes container-color-change {
+            0% {
+                background: rgba(255, 200, 200, 0.95);
+            }
+            10% {
+                background: rgba(255, 230, 200, 0.95);
+            }
+            20% {
+                background: rgba(255, 255, 200, 0.95);
+            }
+            30% {
+                background: rgba(200, 255, 200, 0.95);
+            }
+            40% {
+                background: rgba(200, 255, 255, 0.95);
+            }
+            50% {
+                background: rgba(200, 230, 255, 0.95);
+            }
+            60% {
+                background: rgba(200, 200, 255, 0.95);
+            }
+            70% {
+                background: rgba(230, 200, 255, 0.95);
+            }
+            80% {
+                background: rgba(255, 200, 255, 0.95);
+            }
+            90% {
+                background: rgba(255, 200, 230, 0.95);
+            }
+            100% {
+                background: rgba(255, 200, 200, 0.95);
+            }
+        }
+
+        /* Overlay pour intensifier l'effet multicolore */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 0, 0, 0.1),
+                rgba(255, 154, 0, 0.1),
+                rgba(208, 222, 33, 0.1),
+                rgba(79, 220, 74, 0.1),
+                rgba(63, 218, 216, 0.1),
+                rgba(47, 201, 226, 0.1),
+                rgba(28, 127, 238, 0.1),
+                rgba(95, 21, 242, 0.1)
+            );
+            background-size: 400% 400%;
+            animation: rainbow-overlay 8s ease infinite;
+            pointer-events: none;
+            z-index: 0;
+            border-radius: 15px;
+        }
+
+        @keyframes rainbow-overlay {
+            0% {
+                background-position: 0% 50%;
+                opacity: 0.3;
+            }
+            50% {
+                background-position: 100% 50%;
+                opacity: 0.5;
+            }
+            100% {
+                background-position: 0% 50%;
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes container-glow {
+            0% {
+                box-shadow: 0 0 30px rgba(255, 0, 0, 0.3),
+                            0 0 60px rgba(255, 154, 0, 0.2);
+            }
+            25% {
+                box-shadow: 0 0 30px rgba(79, 220, 74, 0.3),
+                            0 0 60px rgba(63, 218, 216, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(28, 127, 238, 0.3),
+                            0 0 60px rgba(95, 21, 242, 0.2);
+            }
+            75% {
+                box-shadow: 0 0 30px rgba(186, 12, 248, 0.3),
+                            0 0 60px rgba(251, 7, 217, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 30px rgba(255, 0, 0, 0.3),
+                            0 0 60px rgba(255, 154, 0, 0.2);
+            }
+        }
+
+        /* Assurer que le contenu reste au-dessus */
+        header, .main-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Bordure arc-en-ciel animée sur le header */
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(
+                90deg,
+                #ff0000, #ff9a00, #d0de21, #4fdc4a, #3fdad8,
+                #2fc9e2, #1c7fee, #5f15f2, #ba0cf8, #fb07d9, #ff0000
+            );
+            background-size: 200% 100%;
+            animation: rainbow-border 3s linear infinite;
+        }
+
+        header {
+            position: relative;
+        }
+
+        @keyframes rainbow-border {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+
+        /* Particules arc-en-ciel flottantes */
+        @keyframes rainbow-particle {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -39,5 +298,32 @@
     </div>
 
     <script src="niveau.js"></script>
+    <script>
+        // Créer des particules arc-en-ciel flottantes
+        function createRainbowParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'fixed';
+            particle.style.width = '8px';
+            particle.style.height = '8px';
+            particle.style.borderRadius = '50%';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.bottom = '-10px';
+            particle.style.zIndex = '0';
+            particle.style.pointerEvents = 'none';
+            
+            const colors = ['#ff0000', '#ff9a00', '#d0de21', '#4fdc4a', '#3fdad8', '#2fc9e2', '#1c7fee', '#5f15f2', '#ba0cf8', '#fb07d9'];
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+            
+            particle.style.animation = `rainbow-particle ${Math.random() * 5 + 5}s linear`;
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 10000);
+        }
+
+        // Créer des particules régulièrement
+        setInterval(createRainbowParticle, 300);
+    </script>
 </body>
 </html>

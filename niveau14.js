@@ -16,91 +16,68 @@ class Game {
         
         this.currentPhase = 1;
         
-        // Héros coincé en bas à gauche
+        // Héros enfermé en bas à gauche
         this.hero = {
             x: 2,
             y: 5,
             symbol: '🦸',
-            health: 6,
-            maxHealth: 6
+            health: 5,
+            maxHealth: 5
         };
         
-        // Allié
+        // Premier ennemi à 2 blocs du héros (enfermé avec lui)
+        this.firstEnemy = {
+            x: 4,
+            y: 5,
+            symbol: '👹',
+            health: 4,
+            maxHealth: 4,
+            alive: true,
+            damage: 1
+        };
+        
+        // Allié (apparaît après le portail)
         this.ally = {
-            x: 2,
+            x: 8,
             y: 2,
             symbol: '👨',
+            visible: false,
             canShoot: true
         };
         
-        // Portail (phase 1)
-        this.portal = {
-            x: 2,
-            y: 1,
-            symbol: '🔴',
-            active: true
+        // Ennemi que l'allié va tuer avec la flèche
+        this.targetEnemy = {
+            x: 8,
+            y: 5,
+            symbol: '👾',
+            health: 1,
+            maxHealth: 1,
+            alive: true,
+            visible: false
         };
-        
-        // Blocs de bois qui enferment le héros (phase 1)
-        this.woodWalls = [
-            {x: 1, y: 5, destroyed: false},
-            {x: 2, y: 4, destroyed: false},
-            {x: 2, y: 6, destroyed: false},
-            {x: 3, y: 5, destroyed: false}
+        // 3 monstres finaux
+        this.finalEnemies = [
+            {x: 9, y: 2, symbol: '👹', health: 2, maxHealth: 2, alive: true, visible: false, damage: 2},
+            {x: 10, y: 4, symbol: '👹', health: 2, maxHealth: 2, alive: true, visible: false, damage: 2},
+            {x: 9, y: 6, symbol: '👹', health: 2, maxHealth: 2, alive: true, visible: false, damage: 2}
         ];
         
-        // Ennemi 1 que l'allié doit tuer (phase 2)
-        this.enemy1 = {
-            x: 5,
-            y: 2,
-            symbol: '👹',
-            health: 1,
-            maxHealth: 1,
-            alive: true
-        };
-        
-        // Ennemi 2 qui attaque le héros (phase 3)
-        this.enemy2 = {
-            x: 5,
-            y: 5,
-            symbol: '🧟',
-            health: 1,
-            maxHealth: 1,
-            alive: true
-        };
-        
-        // Rivière (phase 4)
-        this.water = [];
-        for (let y = 1; y <= 6; y++) {
-            this.water.push({x: 7, y: y});
-        }
-        
-        // Blocs pour traverser
-        this.blocks = [];
-        
-        // Alien (phase 5)
-        this.alien = {
-            x: 9,
-            y: 3,
-            symbol: '👽',
-            health: 1,
-            maxHealth: 1,
-            alive: true
-        };
-        
-        // Champignon de vie (phase 5)
+        // Champignon de vie
         this.mushroom = {
             x: 10,
-            y: 5,
+            y: 2,
             symbol: '🍄',
-            collected: false
+            collected: false,
+            visible: false
         };
         
-        // Ennemis finaux (phase 5)
-        this.finalEnemies = [
-            {x: 10, y: 2, symbol: '👾', health: 1, maxHealth: 1, alive: true},
-            {x: 10, y: 4, symbol: '👾', health: 1, maxHealth: 1, alive: true}
-        ];
+        // Portail (apparaît après avoir tué le premier ennemi)
+        this.portal = {
+            x: 3,
+            y: 3,
+            symbol: '🔴',
+            visible: false
+        };
         
         // Gemme finale
         this.gem = {
@@ -110,23 +87,151 @@ class Game {
             visible: false
         };
         
-        // Murs fixes
+        // Murs - Prison initiale
         this.walls = [
             // Cadre extérieur
             {x: 0, y: 0}, {x: 1, y: 0}, {x: 2, y: 0}, {x: 3, y: 0}, {x: 4, y: 0}, {x: 5, y: 0}, {x: 6, y: 0}, {x: 7, y: 0}, {x: 8, y: 0}, {x: 9, y: 0}, {x: 10, y: 0}, {x: 11, y: 0},
             {x: 0, y: 1}, {x: 0, y: 2}, {x: 0, y: 3}, {x: 0, y: 4}, {x: 0, y: 5}, {x: 0, y: 6}, {x: 0, y: 7},
             {x: 11, y: 1}, {x: 11, y: 2}, {x: 11, y: 3}, {x: 11, y: 4}, {x: 11, y: 5}, {x: 11, y: 6}, {x: 11, y: 7},
-            {x: 1, y: 7}, {x: 2, y: 7}, {x: 3, y: 7}, {x: 4, y: 7}, {x: 5, y: 7}, {x: 6, y: 7}, {x: 7, y: 7}, {x: 8, y: 7}, {x: 9, y: 7}, {x: 10, y: 7}
+            {x: 1, y: 7}, {x: 2, y: 7}, {x: 3, y: 7}, {x: 4, y: 7}, {x: 5, y: 7}, {x: 6, y: 7}, {x: 7, y: 7}, {x: 8, y: 7}, {x: 9, y: 7}, {x: 10, y: 7},
+            
+            // Prison initiale - enferme le héros et le premier ennemi
+            {x: 1, y: 3}, {x: 2, y: 3}, {x: 3, y: 3}, {x: 4, y: 3}, {x: 5, y: 3},
+            {x: 1, y: 4}, {x: 5, y: 4},
+            {x: 1, y: 5}, {x: 5, y: 5},
+            {x: 1, y: 6}, {x: 2, y: 6}, {x: 3, y: 6}, {x: 4, y: 6}, {x: 5, y: 6},
+            
+            // Murs de séparation pour la zone finale
+            {x: 7, y: 1}, {x: 7, y: 2}, {x: 7, y: 3}, {x: 7, y: 4}, {x: 7, y: 5}, {x: 7, y: 6}
         ];
         
         this.gameOver = false;
-        this.placedBlocks = [];
-        this.enemy2AttackInterval = null;
-        this.alienAttackInterval = null;
+        this.enemyAttackInterval = null;
+        
+        // Démarrer les attaques des ennemis
+        this.startEnemyAttacks();
         
         this.draw();
         this.updateHealthBar();
         this.updatePhaseUI();
+    }
+    
+    startEnemyAttacks() {
+        // Les ennemis attaquent toutes les secondes
+        this.enemyAttackInterval = setInterval(() => {
+            if (this.gameOver) return;
+            
+            // Phase 1: Premier ennemi attaque
+            if (this.currentPhase === 1 && this.firstEnemy.alive) {
+                const dx = Math.abs(this.hero.x - this.firstEnemy.x);
+                const dy = Math.abs(this.hero.y - this.firstEnemy.y);
+                
+                if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+                    this.hero.health -= this.firstEnemy.damage;
+                    this.updateHealthBar();
+                    this.draw();
+                    
+                    console.log('Premier ennemi attaque ! HP:', this.hero.health);
+                    
+                    if (this.hero.health <= 0) {
+                        this.endGame();
+                    }
+                }
+            }
+            
+            // Phase 4: Les 3 ennemis finaux attaquent toutes les secondes
+            if (this.currentPhase >= 4) {
+                this.finalEnemies.forEach(enemy => {
+                    if (enemy.visible && enemy.alive) {
+                        const dx = Math.abs(this.hero.x - enemy.x);
+                        const dy = Math.abs(this.hero.y - enemy.y);
+                        
+                        if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
+                            this.hero.health -= enemy.damage;
+                            this.updateHealthBar();
+                            this.draw();
+                            
+                            console.log('Ennemi final attaque ! Dégâts:', enemy.damage, 'HP restants:', this.hero.health);
+                            
+                            if (this.hero.health <= 0) {
+                                this.endGame();
+                            }
+                        }
+                    }
+                });
+            }
+        }, 1000);
+    }
+    
+    moveHero(direction) {
+        if (this.gameOver) return;
+        
+        let newX = this.hero.x;
+        let newY = this.hero.y;
+        
+        switch(direction) {
+            case 'haut': newY--; break;
+            case 'bas': newY++; break;
+            case 'gauche': newX--; break;
+            case 'droite': newX++; break;
+        }
+        
+        // Vérifier les limites
+        if (newX < 0 || newX >= this.cols || newY < 0 || newY >= this.rows) return;
+        
+        // Vérifier collision avec murs
+        const hitWall = this.walls.some(wall => wall.x === newX && wall.y === newY);
+        if (hitWall) return;
+        
+        // Vérifier collision avec le premier ennemi (phase 1)
+        if (this.currentPhase === 1 && this.firstEnemy.alive && 
+            newX === this.firstEnemy.x && newY === this.firstEnemy.y) return;
+        
+        // Vérifier collision avec l'ennemi cible (phase 3)
+        if (this.targetEnemy.visible && this.targetEnemy.alive && 
+            newX === this.targetEnemy.x && newY === this.targetEnemy.y) return;
+        
+        // Vérifier collision avec les ennemis finaux (phase 4+)
+        const hitFinalEnemy = this.finalEnemies.some(enemy => 
+            enemy.visible && enemy.alive && enemy.x === newX && enemy.y === newY
+        );
+        if (hitFinalEnemy) return;
+        
+        // Déplacer le héros
+        this.hero.x = newX;
+        this.hero.y = newY;
+        
+        // Vérifier si on ramasse le champignon (phase 4)
+        if (this.mushroom.visible && !this.mushroom.collected && 
+            this.hero.x === this.mushroom.x && this.hero.y === this.mushroom.y) {
+            this.mushroom.collected = true;
+            this.hero.health = Math.min(this.hero.health + 2, this.hero.maxHealth);
+            this.updateHealthBar();
+            this.score += 100;
+            document.getElementById('score').textContent = this.score;
+            alert('🍄 Champignon récupéré ! +2 PV !');
+        }
+        
+        // Vérifier si on atteint la gemme finale (phase 5)
+        if (this.gem.visible && this.hero.x === this.gem.x && this.hero.y === this.gem.y) {
+            this.winGame();
+        }
+        
+        this.draw();
+    }
+    
+    endGame() {
+        this.gameOver = true;
+        clearInterval(this.enemyAttackInterval);
+        
+        this.draw();
+        
+        setTimeout(() => {
+            alert('💀 Game Over ! Les ennemis t\'ont vaincu !');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }, 500);
     }
     
     updatePhaseUI() {
@@ -137,24 +242,24 @@ class Game {
         
         switch(this.currentPhase) {
             case 1:
-                phaseTitle.textContent = 'Phase 1/5 - Évasion';
-                info.textContent = 'Tu es coincé par des blocs de bois ! Utilise le portail pour t\'échapper !';
+                phaseTitle.textContent = 'Phase 1/5 - Premier Combat';
+                info.textContent = 'Tu es enfermé avec un ennemi à 2 blocs ! Rapproche-toi et attaque-le pour débloquer le portail !';
                 break;
             case 2:
-                phaseTitle.textContent = 'Phase 2/5 - Premier Ennemi';
-                info.textContent = 'Un ennemi bloque le chemin ! Ton allié peut le tuer avec une flèche !';
+                phaseTitle.textContent = 'Phase 2/5 - Téléportation';
+                info.textContent = 'Le portail est apparu ! Clique sur "Utiliser Portail" pour te téléporter !';
                 break;
             case 3:
-                phaseTitle.textContent = 'Phase 3/5 - Combat Dangereux';
-                info.textContent = 'Un ennemi attaque et enlève 2 PV par seconde ! Rapproche-toi et attaque-le vite !';
+                phaseTitle.textContent = 'Phase 3/5 - Flèche de l\'Allié';
+                info.textContent = 'Ton allié peut tirer une flèche pour tuer un monstre ! Clique sur "Lancer Flèche" !';
                 break;
             case 4:
-                phaseTitle.textContent = 'Phase 4/5 - Traversée';
-                info.textContent = 'Une rivière bloque le passage ! Pose un bloc pour traverser puis avance !';
+                phaseTitle.textContent = 'Phase 4/5 - Combat Final';
+                info.textContent = 'Il reste 3 monstres ! Récupère le champignon 🍄 pour te soigner puis attaque tous les ennemis !';
                 break;
             case 5:
-                phaseTitle.textContent = 'Phase 5/5 - BOSS FINAL';
-                info.textContent = 'Un alien te tue en 1,7s ! Récupère le champignon 🍄 puis tue tous les ennemis !';
+                phaseTitle.textContent = 'Phase 5/5 - Victoire !';
+                info.textContent = 'Tous les ennemis sont vaincus ! Va chercher la gemme pour terminer le jeu ! 💎';
                 break;
         }
     }
@@ -166,67 +271,42 @@ class Game {
         // Dessiner les murs
         this.walls.forEach(wall => this.drawWall(wall.x, wall.y));
         
-        // Dessiner les blocs de bois (phase 1)
-        if (this.currentPhase === 1) {
-            this.woodWalls.forEach(wall => {
-                if (!wall.destroyed) {
-                    this.drawWoodWall(wall.x, wall.y);
-                }
-            });
+        // Dessiner le portail (phase 2+)
+        if (this.portal.visible) {
+            this.drawPortal(this.portal.x, this.portal.y, this.portal.symbol);
         }
         
-        // Dessiner le portail (phase 1)
-        if (this.currentPhase === 1 && this.portal.active) {
-            this.drawCharacter(this.portal.x, this.portal.y, this.portal.symbol);
+        // Dessiner le premier ennemi (phase 1)
+        if (this.firstEnemy.alive) {
+            this.drawCharacter(this.firstEnemy.x, this.firstEnemy.y, this.firstEnemy.symbol);
+            this.drawHealthBar(this.firstEnemy);
         }
         
-        // Dessiner l'allié
-        this.drawCharacter(this.ally.x, this.ally.y, this.ally.symbol);
-        
-        // Dessiner enemy1 (phase 2+) - visible dès le début
-        if (this.enemy1.alive) {
-            this.drawCharacter(this.enemy1.x, this.enemy1.y, this.enemy1.symbol);
-            this.drawHealthBar(this.enemy1);
+        // Dessiner l'allié (phase 3+)
+        if (this.ally.visible) {
+            this.drawCharacter(this.ally.x, this.ally.y, this.ally.symbol);
         }
         
-        // Dessiner enemy2 (phase 3+)
-        if (this.currentPhase >= 3 && this.enemy2.alive) {
-            this.drawCharacter(this.enemy2.x, this.enemy2.y, this.enemy2.symbol);
-            this.drawHealthBar(this.enemy2);
+        // Dessiner l'ennemi cible de la flèche (phase 3)
+        if (this.targetEnemy.visible && this.targetEnemy.alive) {
+            this.drawCharacter(this.targetEnemy.x, this.targetEnemy.y, this.targetEnemy.symbol);
+            this.drawHealthBar(this.targetEnemy);
         }
         
-        // Dessiner la rivière (phase 4+)
-        if (this.currentPhase >= 4) {
-            this.water.forEach(w => this.drawWater(w.x, w.y));
-        }
-        
-        // Dessiner les blocs posés
-        this.placedBlocks.forEach(block => {
-            this.drawBlock(block.x, block.y);
+        // Dessiner les 3 ennemis finaux (phase 4+)
+        this.finalEnemies.forEach(enemy => {
+            if (enemy.visible && enemy.alive) {
+                this.drawCharacter(enemy.x, enemy.y, enemy.symbol);
+                this.drawHealthBar(enemy);
+            }
         });
         
-        // Dessiner l'alien (phase 5)
-        if (this.currentPhase >= 5 && this.alien.alive) {
-            this.drawCharacter(this.alien.x, this.alien.y, this.alien.symbol);
-            this.drawHealthBar(this.alien);
-        }
-        
-        // Dessiner le champignon (phase 5)
-        if (this.currentPhase >= 5 && !this.mushroom.collected) {
+        // Dessiner le champignon (phase 4+)
+        if (this.mushroom.visible && !this.mushroom.collected) {
             this.drawCharacter(this.mushroom.x, this.mushroom.y, this.mushroom.symbol);
         }
         
-        // Dessiner les ennemis finaux (phase 5)
-        if (this.currentPhase >= 5) {
-            this.finalEnemies.forEach(enemy => {
-                if (enemy.alive) {
-                    this.drawCharacter(enemy.x, enemy.y, enemy.symbol);
-                    this.drawHealthBar(enemy);
-                }
-            });
-        }
-        
-        // Dessiner la gemme
+        // Dessiner la gemme (phase 5)
         if (this.gem.visible) {
             this.drawCharacter(this.gem.x, this.gem.y, this.gem.symbol);
         }
@@ -266,45 +346,6 @@ class Game {
         this.ctx.strokeRect(posX, posY, this.gridSize, this.gridSize);
     }
     
-    drawWoodWall(x, y) {
-        const posX = x * this.gridSize;
-        const posY = y * this.gridSize;
-        
-        this.ctx.fillStyle = '#8b4513';
-        this.ctx.fillRect(posX, posY, this.gridSize, this.gridSize);
-        
-        this.ctx.strokeStyle = '#654321';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(posX, posY, this.gridSize, this.gridSize);
-        
-        // Texture bois
-        this.ctx.fillStyle = '#a0522d';
-        this.ctx.fillRect(posX + 5, posY + 5, this.gridSize - 10, this.gridSize - 10);
-    }
-    
-    drawWater(x, y) {
-        const posX = x * this.gridSize;
-        const posY = y * this.gridSize;
-        
-        this.ctx.fillStyle = '#4299e1';
-        this.ctx.fillRect(posX, posY, this.gridSize, this.gridSize);
-        
-        this.ctx.fillStyle = '#63b3ed';
-        this.ctx.fillRect(posX + 5, posY + 5, this.gridSize - 10, this.gridSize - 10);
-    }
-    
-    drawBlock(x, y) {
-        const posX = x * this.gridSize;
-        const posY = y * this.gridSize;
-        
-        this.ctx.fillStyle = '#8b4513';
-        this.ctx.fillRect(posX, posY, this.gridSize, this.gridSize);
-        
-        this.ctx.strokeStyle = '#654321';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(posX, posY, this.gridSize, this.gridSize);
-    }
-    
     drawCharacter(x, y, symbol) {
         const centerX = x * this.gridSize + this.gridSize / 2;
         const centerY = y * this.gridSize + this.gridSize / 2;
@@ -335,6 +376,25 @@ class Game {
         this.ctx.fillRect(posX + 5, posY, barWidth * healthPercentage, barHeight);
     }
     
+    drawPortal(x, y, symbol) {
+        const centerX = x * this.gridSize + this.gridSize / 2;
+        const centerY = y * this.gridSize + this.gridSize / 2;
+        
+        // Aura du portail
+        const gradient = this.ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, 20);
+        gradient.addColorStop(0, 'rgba(168, 85, 247, 0.5)');
+        gradient.addColorStop(1, 'rgba(168, 85, 247, 0)');
+        
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(x * this.gridSize, y * this.gridSize, this.gridSize, this.gridSize);
+        
+        // Symbole du portail
+        this.ctx.font = '30px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(symbol, centerX, centerY);
+    }
+    
     updateHealthBar() {
         const healthFill = document.getElementById('hero-health');
         const healthValue = document.getElementById('health-value');
@@ -343,290 +403,209 @@ class Game {
         healthFill.style.width = percentage + '%';
         healthValue.textContent = this.hero.health;
         
+        console.log('Update HP bar:', this.hero.health, '/', this.hero.maxHealth, '=', percentage + '%');
+        
         healthFill.className = 'health-fill';
-        if (percentage <= 33) {
-            healthFill.classList.add('low');
-        } else if (percentage <= 66) {
-            healthFill.classList.add('medium');
-        }
-    }
-    
-    // PHASE 1: Portail
-    usePortal() {
-        if (this.gameOver) return;
-        
-        if (this.currentPhase !== 1) {
-            alert('⚠️ Le portail n\'est plus disponible !');
-            return;
-        }
-        
-        if (!this.portal.active) {
-            alert('⚠️ Le portail a déjà été utilisé !');
-            return;
-        }
-        
-        // Téléporter le héros
-        this.hero.x = 4;
-        this.hero.y = 2;
-        this.portal.active = false;
-        this.score += 100;
-        document.getElementById('score').textContent = this.score;
-        
-        this.draw();
-        
-        setTimeout(() => {
-            this.currentPhase = 2;
-            this.updatePhaseUI();
-            this.updateButtonsPhase2();
-        }, 500);
-    }
-    
-    // PHASE 2: Allié tire une flèche
-    updateButtonsPhase2() {
-        document.getElementById('btn-portail').style.display = 'none';
-        document.getElementById('btn-fleche').style.display = 'inline-block';
-    }
-    
-    allyShoot() {
-        if (this.currentPhase !== 2 || !this.enemy1.alive) return;
-        
-        this.enemy1.alive = false;
-        this.score += 150;
-        document.getElementById('score').textContent = this.score;
-        
-        this.draw();
-        
-        setTimeout(() => {
-            this.currentPhase = 3;
-            this.updatePhaseUI();
-            this.startEnemy2Attacks();
-            this.updateButtonsPhase3();
-        }, 500);
-    }
-    
-    // PHASE 3: Combat avec enemy2 qui attaque
-    startEnemy2Attacks() {
-        this.enemy2AttackInterval = setInterval(() => {
-            if (this.enemy2.alive && !this.gameOver && this.currentPhase === 3) {
-                this.hero.health -= 2;
-                this.updateHealthBar();
-                
-                if (this.hero.health <= 0) {
-                    this.endGame();
-                }
-            }
-        }, 1000);
-    }
-    
-    updateButtonsPhase3() {
-        document.getElementById('btn-fleche').style.display = 'none';
-        document.getElementById('btn-attaque').style.display = 'inline-block';
-    }
-    
-    moveHero(direction) {
-        if (this.gameOver) return;
-        
-        let newX = this.hero.x;
-        let newY = this.hero.y;
-        
-        switch(direction) {
-            case 'haut': newY--; break;
-            case 'bas': newY++; break;
-            case 'gauche': newX--; break;
-            case 'droite': newX++; break;
-        }
-        
-        if (newX < 0 || newX >= this.cols || newY < 0 || newY >= this.rows) return;
-        
-        const hitWall = this.walls.some(wall => wall.x === newX && wall.y === newY);
-        if (hitWall) return;
-        
-        const hitWood = this.woodWalls.some(wall => wall.x === newX && wall.y === newY && !wall.destroyed);
-        if (hitWood) return;
-        
-        if (this.enemy2.alive && newX === this.enemy2.x && newY === this.enemy2.y) return;
-        if (this.alien.alive && newX === this.alien.x && newY === this.alien.y) return;
-        
-        const hitFinalEnemy = this.finalEnemies.some(enemy => enemy.alive && enemy.x === newX && enemy.y === newY);
-        if (hitFinalEnemy) return;
-        
-        const hitWater = this.water.some(w => w.x === newX && w.y === newY);
-        const hasBlock = this.placedBlocks.some(b => b.x === newX && b.y === newY);
-        if (hitWater && !hasBlock) return;
-        
-        this.hero.x = newX;
-        this.hero.y = newY;
-        
-        // Vérifier le champignon
-        if (!this.mushroom.collected && this.hero.x === this.mushroom.x && this.hero.y === this.mushroom.y) {
-            this.mushroom.collected = true;
-            this.hero.health = Math.min(this.hero.maxHealth, this.hero.health + 3);
-            this.updateHealthBar();
-            this.score += 100;
-            document.getElementById('score').textContent = this.score;
-        }
-        
-        // Vérifier la gemme
-        if (this.gem.visible && this.hero.x === this.gem.x && this.hero.y === this.gem.y) {
-            this.winGame();
-        }
-        
-        this.draw();
     }
     
     attackEnemy() {
         if (this.gameOver) return;
         
-        // Phase 3: Attaquer enemy2
-        if (this.currentPhase === 3 && this.enemy2.alive) {
-            const dx = Math.abs(this.hero.x - this.enemy2.x);
-            const dy = Math.abs(this.hero.y - this.enemy2.y);
+        // Phase 1: Attaquer le premier ennemi
+        if (this.currentPhase === 1 && this.firstEnemy.alive) {
+            const dx = Math.abs(this.hero.x - this.firstEnemy.x);
+            const dy = Math.abs(this.hero.y - this.firstEnemy.y);
             
             if (!((dx === 1 && dy === 0) || (dx === 0 && dy === 1))) {
-                alert('⚠️ Tu es trop loin ! Rapproche-toi (1 carreau) !');
+                alert('⚠️ Tu es trop loin ! Rapproche-toi à 1 case de l\'ennemi !');
                 return;
             }
             
-            this.enemy2.alive = false;
-            clearInterval(this.enemy2AttackInterval);
-            this.score += 200;
+            // Infliger 1 dégât à l'ennemi
+            this.firstEnemy.health--;
+            this.score += 50;
             document.getElementById('score').textContent = this.score;
             
             this.draw();
             
-            setTimeout(() => {
-                this.currentPhase = 4;
-                this.updatePhaseUI();
-                this.updateButtonsPhase4();
-            }, 500);
+            // Vérifier si l'ennemi est mort
+            if (this.firstEnemy.health <= 0) {
+                this.firstEnemy.alive = false;
+                clearInterval(this.enemyAttackInterval);
+                this.score += 50;
+                document.getElementById('score').textContent = this.score;
+                
+                // Passer à la phase 2 - Faire apparaître le portail
+                setTimeout(() => {
+                    this.portal.visible = true;
+                    this.currentPhase = 2;
+                    this.updatePhaseUI();
+                    
+                    // Cacher le bouton attaque et montrer le bouton portail
+                    document.getElementById('btn-attaque').style.display = 'none';
+                    document.getElementById('btn-portail').style.display = 'inline-block';
+                    
+                    this.draw();
+                    alert('🎉 Ennemi vaincu ! Un portail est apparu ! Utilise-le pour te téléporter !');
+                }, 500);
+            }
+            return;
         }
         
-        // Phase 5: Attaquer alien ou ennemis finaux
-        if (this.currentPhase === 5) {
-            // Attaquer l'alien
-            if (this.alien.alive) {
-                const dx = Math.abs(this.hero.x - this.alien.x);
-                const dy = Math.abs(this.hero.y - this.alien.y);
-                
-                if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-                    this.alien.alive = false;
-                    clearInterval(this.alienAttackInterval);
-                    this.score += 250;
-                    document.getElementById('score').textContent = this.score;
-                    this.draw();
-                    return;
-                }
-            }
+        // Phase 4: Attaquer les 3 ennemis finaux
+        if (this.currentPhase >= 4) {
+            let attackedEnemy = null;
             
-            // Attaquer les ennemis finaux
-            for (let enemy of this.finalEnemies) {
-                if (enemy.alive) {
+            this.finalEnemies.forEach(enemy => {
+                if (enemy.visible && enemy.alive) {
                     const dx = Math.abs(this.hero.x - enemy.x);
                     const dy = Math.abs(this.hero.y - enemy.y);
                     
                     if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1)) {
-                        enemy.alive = false;
-                        this.score += 200;
-                        document.getElementById('score').textContent = this.score;
-                        this.draw();
-                        
-                        // Vérifier si tous les ennemis sont morts
-                        const allDead = !this.alien.alive && this.finalEnemies.every(e => !e.alive);
-                        if (allDead) {
-                            this.gem.visible = true;
-                            this.draw();
-                        }
-                        return;
+                        attackedEnemy = enemy;
                     }
                 }
+            });
+            
+            if (!attackedEnemy) {
+                alert('⚠️ Aucun ennemi à portée ! Rapproche-toi à 1 case d\'un ennemi !');
+                return;
             }
             
-            alert('⚠️ Aucun ennemi à portée !');
-        }
-    }
-    
-    // PHASE 4: Poser un bloc
-    updateButtonsPhase4() {
-        document.getElementById('btn-attaque').style.display = 'none';
-        document.getElementById('btn-poser').style.display = 'inline-block';
-    }
-    
-    placeBlock() {
-        if (this.currentPhase !== 4) return;
-        
-        // Trouver une case d'eau adjacente
-        const directions = [
-            {x: this.hero.x, y: this.hero.y - 1},
-            {x: this.hero.x, y: this.hero.y + 1},
-            {x: this.hero.x - 1, y: this.hero.y},
-            {x: this.hero.x + 1, y: this.hero.y}
-        ];
-        
-        for (let dir of directions) {
-            const isWater = this.water.some(w => w.x === dir.x && w.y === dir.y);
-            const hasBlock = this.placedBlocks.some(b => b.x === dir.x && b.y === dir.y);
+            // Infliger 1 dégât à l'ennemi
+            attackedEnemy.health--;
+            this.score += 75;
+            document.getElementById('score').textContent = this.score;
             
-            if (isWater && !hasBlock) {
-                this.placedBlocks.push({x: dir.x, y: dir.y});
-                this.score += 50;
+            // Vérifier si l'ennemi est mort
+            if (attackedEnemy.health <= 0) {
+                attackedEnemy.alive = false;
+                this.score += 75;
                 document.getElementById('score').textContent = this.score;
-                this.draw();
-                
+            }
+            
+            this.draw();
+            
+            // Vérifier si tous les ennemis sont morts
+            const allDead = this.finalEnemies.every(enemy => !enemy.alive);
+            
+            if (allDead) {
                 setTimeout(() => {
                     this.currentPhase = 5;
                     this.updatePhaseUI();
-                    this.startAlienAttacks();
-                    this.updateButtonsPhase5();
+                    this.gem.visible = true;
+                    this.draw();
+                    alert('🎉 Tous les ennemis sont vaincus ! La gemme est apparue ! Va la chercher ! 💎');
                 }, 500);
-                return;
             }
         }
+    }
+    
+    usePortal() {
+        if (this.gameOver || this.currentPhase !== 2) return;
         
-        alert('⚠️ Aucune case d\'eau adjacente !');
-    }
-    
-    // PHASE 5: Boss final
-    startAlienAttacks() {
-        this.alienAttackInterval = setInterval(() => {
-            if (this.alien.alive && !this.gameOver && this.currentPhase === 5) {
-                const dx = Math.abs(this.hero.x - this.alien.x);
-                const dy = Math.abs(this.hero.y - this.alien.y);
-                
-                if ((dx === 1 && dy === 0) || (dx === 0 && dy === 1) || (dx === 0 && dy === 0)) {
-                    this.hero.health = 0;
-                    this.updateHealthBar();
-                    this.endGame();
-                }
-            }
-        }, 1700);
-    }
-    
-    updateButtonsPhase5() {
-        document.getElementById('btn-poser').style.display = 'none';
-        document.getElementById('btn-attaque').style.display = 'inline-block';
-    }
-    
-    endGame() {
-        this.gameOver = true;
-        clearInterval(this.enemy2AttackInterval);
-        clearInterval(this.alienAttackInterval);
+        // Téléporter le héros de l'autre côté du mur
+        this.hero.x = 8;
+        this.hero.y = 3;
         
+        this.score += 100;
+        document.getElementById('score').textContent = this.score;
+        
+        this.draw();
+        
+        // Passer à la phase 3
         setTimeout(() => {
-            alert('💀 Game Over ! Le boss t\'a vaincu !');
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+            this.currentPhase = 3;
+            this.updatePhaseUI();
+            
+            // Faire apparaître l'allié et l'ennemi cible
+            this.ally.visible = true;
+            this.targetEnemy.visible = true;
+            
+            // Cacher le bouton portail et montrer le bouton flèche
+            document.getElementById('btn-portail').style.display = 'none';
+            document.getElementById('btn-fleche').style.display = 'inline-block';
+            
+            this.draw();
+            alert('🧝 Un allié apparaît ! Il peut tirer une flèche pour tuer l\'ennemi cible ! 🏹');
         }, 500);
+    }
+    
+    shootArrow() {
+        if (this.gameOver || this.currentPhase !== 3) return;
+        
+        if (!this.ally.canShoot) {
+            alert('⚠️ L\'allié a déjà tiré sa flèche !');
+            return;
+        }
+        
+        // Animation de la flèche
+        this.drawArrowAnimation(this.ally.x, this.ally.y, this.targetEnemy.x, this.targetEnemy.y, () => {
+            // Tuer l'ennemi cible
+            this.targetEnemy.alive = false;
+            this.ally.canShoot = false;
+            
+            this.score += 150;
+            document.getElementById('score').textContent = this.score;
+            
+            this.draw();
+            
+            // Passer à la phase 4 - Combat final
+            setTimeout(() => {
+                this.currentPhase = 4;
+                this.updatePhaseUI();
+                
+                // Faire apparaître les 3 ennemis finaux et le champignon
+                this.finalEnemies.forEach(enemy => enemy.visible = true);
+                this.mushroom.visible = true;
+                
+                // Cacher le bouton flèche et montrer le bouton attaque
+                document.getElementById('btn-fleche').style.display = 'none';
+                document.getElementById('btn-attaque').style.display = 'inline-block';
+                
+                this.draw();
+                alert('🏹 Flèche tirée ! Il reste 3 monstres ! Récupère le champignon 🍄 puis bats-les tous !');
+            }, 500);
+        });
+    }
+    
+    drawArrowAnimation(startX, startY, endX, endY, callback) {
+        const steps = 20;
+        let currentStep = 0;
+        
+        const intervalId = setInterval(() => {
+            this.draw();
+            
+            // Calculer la position actuelle de la flèche
+            const progress = currentStep / steps;
+            const arrowX = startX + (endX - startX) * progress;
+            const arrowY = startY + (endY - startY) * progress;
+            
+            // Dessiner la flèche qui vole
+            const centerX = arrowX * this.gridSize + this.gridSize / 2;
+            const centerY = arrowY * this.gridSize + this.gridSize / 2;
+            
+            this.ctx.font = '25px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText('➤', centerX, centerY);
+            
+            currentStep++;
+            
+            if (currentStep > steps) {
+                clearInterval(intervalId);
+                callback();
+            }
+        }, 30);
     }
     
     winGame() {
         this.gameOver = true;
-        clearInterval(this.enemy2AttackInterval);
-        clearInterval(this.alienAttackInterval);
         
         this.score += 500;
         document.getElementById('score').textContent = this.score;
         
+        // Sauvegarder la progression
         localStorage.setItem('codecombat_level', 15);
         localStorage.setItem('codecombat_score', this.score);
         
@@ -637,7 +616,7 @@ class Game {
         }
         
         setTimeout(() => {
-            alert('🎉 VICTOIRE ! Tu as vaincu le BOSS FINAL ! 👑');
+            alert('🎉🎉🎉 FÉLICITATIONS ! 🎉🎉🎉\n\nTu as vaincu le BOSS FINAL !\nTu as terminé Code Combat ! 👑');
             setTimeout(() => {
                 window.location.href = 'victoire.html?score=' + this.score + '&level=14';
             }, 1000);
@@ -650,20 +629,16 @@ function moveHero(direction) {
     if (game) game.moveHero(direction);
 }
 
+function attackEnemy() {
+    if (game) game.attackEnemy();
+}
+
 function usePortal() {
     if (game) game.usePortal();
 }
 
 function allyShoot() {
-    if (game) game.allyShoot();
-}
-
-function placeBlock() {
-    if (game) game.placeBlock();
-}
-
-function attackEnemy() {
-    if (game) game.attackEnemy();
+    if (game) game.shootArrow();
 }
 
 // Initialiser le jeu

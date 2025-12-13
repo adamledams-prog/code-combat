@@ -16,6 +16,38 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            transition: background 1s ease;
+        }
+
+        body.thunder-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            position: relative;
+        }
+
+        body.thunder-mode::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255, 215, 0, 0.03) 40px, rgba(255, 215, 0, 0.03) 80px),
+                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255, 215, 0, 0.03) 40px, rgba(255, 215, 0, 0.03) 80px);
+            pointer-events: none;
+            z-index: 0;
+            animation: thunderBackground 10s linear infinite;
+        }
+
+        @keyframes thunderBackground {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { opacity: 0.3; }
+        }
+
+        body.thunder-mode .container {
+            position: relative;
+            z-index: 1;
         }
 
         .container {
@@ -106,8 +138,30 @@
 
         .level-card.completed {
             background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.3));
-            border-color: #fbbf24;
+            border: 3px solid transparent;
+            background-clip: padding-box;
             box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3);
+            position: relative;
+        }
+
+        .level-card.completed::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            border-radius: 20px;
+            z-index: -1;
+            animation: rainbow 3s linear infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .level-card.completed:hover {
@@ -129,14 +183,14 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             margin-bottom: 10px;
             position: relative;
-            z-index: 1;
+            z-index: 20;
         }
 
         .level-status {
             font-size: 2em;
             margin-bottom: 8px;
             position: relative;
-            z-index: 1;
+            z-index: 20;
         }
 
         .level-label {
@@ -145,7 +199,182 @@
             font-size: 0.9em;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
             position: relative;
-            z-index: 1;
+            z-index: 20;
+        }
+
+        .thunder-world-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 50%, #ff4500 100%);
+            color: white;
+            padding: 20px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: 4px solid #ffd700;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+            transition: all 0.3s ease;
+            margin: 20px;
+            animation: thunderPulse 2s infinite;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .thunder-world-button:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.7);
+        }
+
+        @keyframes thunderPulse {
+            0%, 100% { box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 10px 50px rgba(255, 215, 0, 0.9); }
+        }
+
+        @keyframes thunderGlow {
+            0%, 100% { 
+                box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3), 0 0 20px rgba(255, 215, 0, 0.2); 
+            }
+            50% { 
+                box-shadow: 0 8px 35px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.4); 
+            }
+        }
+
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .thunder-lightning {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .thunder-lightning::before,
+        .thunder-lightning::after {
+            content: '';
+            position: absolute;
+            background: linear-gradient(to bottom, 
+                rgba(255, 255, 255, 1) 0%,
+                rgba(255, 255, 200, 0.9) 20%,
+                rgba(255, 255, 100, 0.7) 40%,
+                rgba(255, 200, 0, 0.5) 60%,
+                transparent 100%);
+            width: 3px;
+            filter: blur(0.5px);
+            box-shadow: 
+                0 0 5px rgba(255, 255, 255, 0.9),
+                0 0 10px rgba(255, 255, 0, 0.7),
+                0 0 20px rgba(255, 200, 0, 0.5);
+        }
+
+        .thunder-lightning::before {
+            height: 100%;
+            left: 0;
+        }
+
+        .thunder-lightning::after {
+            height: 60%;
+            left: -8px;
+            top: 30%;
+            width: 2px;
+            opacity: 0.7;
+        }
+
+        .lightning-1 {
+            left: 15%;
+            animation: lightning-bolt 3s infinite;
+            animation-delay: 0.2s;
+        }
+        .lightning-1::before { transform: rotate(-8deg) skewX(-15deg); }
+        .lightning-1::after { transform: rotate(5deg) skewX(10deg); }
+
+        .lightning-2 {
+            left: 35%;
+            animation: lightning-bolt 2.8s infinite;
+            animation-delay: 1s;
+        }
+        .lightning-2::before { transform: rotate(6deg) skewX(12deg); }
+        .lightning-2::after { transform: rotate(-8deg) skewX(-8deg); }
+
+        .lightning-3 {
+            left: 50%;
+            animation: lightning-bolt 3.2s infinite;
+            animation-delay: 0.5s;
+        }
+        .lightning-3::before { transform: rotate(-10deg) skewX(-20deg); }
+        .lightning-3::after { transform: rotate(4deg) skewX(15deg); }
+
+        .lightning-4 {
+            left: 70%;
+            animation: lightning-bolt 2.9s infinite;
+            animation-delay: 1.5s;
+        }
+        .lightning-4::before { transform: rotate(9deg) skewX(18deg); }
+        .lightning-4::after { transform: rotate(-6deg) skewX(-12deg); }
+
+        .lightning-5 {
+            left: 88%;
+            animation: lightning-bolt 3.1s infinite;
+            animation-delay: 0.8s;
+        }
+        .lightning-5::before { transform: rotate(-7deg) skewX(-16deg); }
+        .lightning-5::after { transform: rotate(7deg) skewX(14deg); }
+
+        .lightning-6 {
+            left: 25%;
+            animation: lightning-bolt 2.6s infinite;
+            animation-delay: 1.8s;
+        }
+        .lightning-6::before { transform: rotate(11deg) skewX(22deg); }
+        .lightning-6::after { transform: rotate(-9deg) skewX(-14deg); }
+
+        .lightning-7 {
+            left: 60%;
+            animation: lightning-bolt 2.7s infinite;
+            animation-delay: 2.2s;
+        }
+        .lightning-7::before { transform: rotate(-11deg) skewX(-19deg); }
+        .lightning-7::after { transform: rotate(6deg) skewX(11deg); }
+
+        .lightning-8 {
+            left: 78%;
+            animation: lightning-bolt 2.5s infinite;
+            animation-delay: 2.5s;
+        }
+        .lightning-8::before { transform: rotate(8deg) skewX(17deg); }
+        .lightning-8::after { transform: rotate(-7deg) skewX(-13deg); }
+
+        @keyframes lightning-bolt {
+            0%, 100% {
+                opacity: 0;
+            }
+            1% {
+                opacity: 1;
+            }
+            2% {
+                opacity: 0;
+            }
+            3% {
+                opacity: 0.8;
+            }
+            4% {
+                opacity: 0;
+            }
+            5% {
+                opacity: 0.6;
+            }
+            6%, 98% {
+                opacity: 0;
+            }
         }
 
         .back-button {
@@ -247,11 +476,22 @@
                 <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
             </div>
             <div class="progress-text">
-                <span id="completed-levels">0</span> / 50 niveaux complétés
+                <span id="completed-levels">0</span> / <span id="total-levels">14</span> niveaux complétés
             </div>
         </div>
 
-        <div class="levels-grid" id="levels-grid"></div>
+        <div class="levels-grid" id="levels-grid-normal"></div>
+
+        <div class="center" id="thunder-world-container" style="display: none; margin: 30px 0;">
+            <a href="#" class="thunder-world-button" onclick="showThunderAnimation(); return false;">⚡ MONDE FOUDRE ⚡</a>
+        </div>
+
+        <div class="levels-grid" id="levels-grid-thunder" style="display: none;"></div>
+
+        <!-- Animation Foudre -->
+        <div id="thunder-animation" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; justify-content: center; align-items: center;">
+            <canvas id="thunder-canvas" width="800" height="600"></canvas>
+        </div>
 
         <div class="center">
             <a href="accueil.html" class="back-button">🏠 Retour à l'Accueil</a>
@@ -263,19 +503,28 @@
         const currentLevel = parseInt(localStorage.getItem('codecombat_level')) || 1;
         const totalScore = parseInt(localStorage.getItem('codecombat_score')) || 0;
         const completedLevels = JSON.parse(localStorage.getItem('codecombat_completed')) || [];
+        const thunderUnlocked = localStorage.getItem('codecombat_thunder_unlocked') === 'true';
 
         document.getElementById('total-score').textContent = totalScore;
         document.getElementById('completed-levels').textContent = completedLevels.length;
         
-        const progressPercentage = (completedLevels.length / 50) * 100;
+        const totalLevelsCount = thunderUnlocked ? 28 : 14;
+        document.getElementById('total-levels').textContent = totalLevelsCount;
+        
+        const progressPercentage = (completedLevels.length / totalLevelsCount) * 100;
         document.getElementById('progress-percentage').textContent = progressPercentage.toFixed(0) + '%';
         document.getElementById('progress-fill').style.width = progressPercentage + '%';
 
-        const levelsGrid = document.getElementById('levels-grid');
+        const levelsGridNormal = document.getElementById('levels-grid-normal');
+        const levelsGridThunder = document.getElementById('levels-grid-thunder');
+        const maxLevel = thunderUnlocked ? 28 : 14;
 
-        // Créer les 50 niveaux
-        for (let i = 1; i <= 50; i++) {
+        // Créer les niveaux (14 normaux + 14 foudre si débloqué)
+        for (let i = 1; i <= maxLevel; i++) {
+            const isThunderLevel = i >= 15 && i <= 28;
+            const targetGrid = isThunderLevel ? levelsGridThunder : levelsGridNormal;
             const levelCard = document.createElement('div');
+            levelCard.setAttribute('data-level', i);
             
             let status, statusEmoji, statusLabel;
             
@@ -296,10 +545,11 @@
                 statusLabel = 'Verrouillé';
             }
             
-            // Vérifier si c'est le niveau boss 7
+            // Vérifier si c'est un niveau spécial
             const isBoss = i === 7;
             
             levelCard.className = `level-card ${status}`;
+            
             if (isBoss) {
                 levelCard.innerHTML = `
                     <div class="level-status">${statusEmoji}</div>
@@ -307,6 +557,29 @@
                     <div class="level-number">${i}</div>
                     <div class="level-label">${statusLabel}</div>
                 `;
+            } else if (isThunderLevel) {
+                levelCard.innerHTML = `
+                    <div class="thunder-lightning lightning-1"></div>
+                    <div class="thunder-lightning lightning-2"></div>
+                    <div class="thunder-lightning lightning-3"></div>
+                    <div class="thunder-lightning lightning-4"></div>
+                    <div class="thunder-lightning lightning-5"></div>
+                    <div class="thunder-lightning lightning-6"></div>
+                    <div class="thunder-lightning lightning-7"></div>
+                    <div class="thunder-lightning lightning-8"></div>
+                    <div class="level-status">${statusEmoji}</div>
+                    <div style="font-size: 0.9em; font-weight: bold; color: #ffd700; margin-bottom: 5px;">⚡ FOUDRE</div>
+                    <div class="level-number">${i}</div>
+                    <div class="level-label">${statusLabel}</div>
+                `;
+                // Ajouter un style spécial pour les niveaux foudre
+                levelCard.style.background = 'linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 140, 0, 0.3))';
+                levelCard.style.borderColor = '#ffd700';
+                levelCard.style.animation = 'thunderGlow 2s infinite';
+                levelCard.style.overflow = 'hidden';
+                
+                // Cacher tous les niveaux foudre par défaut (ils apparaissent après la vidéo)
+                levelCard.style.display = 'none';
             } else {
                 levelCard.innerHTML = `
                     <div class="level-status">${statusEmoji}</div>
@@ -346,6 +619,8 @@
                         window.location.href = `niveau13.html?score=${totalScore}`;
                     } else if (i === 14) {
                         window.location.href = `niveau14.html?score=${totalScore}`;
+                    } else if (i >= 15 && i <= 28) {
+                        alert(`⚡ Le niveau Foudre ${i} arrive bientôt! ⚡`);
                     } else {
                         alert(`Le niveau ${i} arrive bientôt! 🚀`);
                     }
@@ -356,8 +631,286 @@
                 });
             }
             
-            levelsGrid.appendChild(levelCard);
+            targetGrid.appendChild(levelCard);
+        }
+
+        // Afficher le bouton Monde Foudre si le niveau 14 est complété
+        if (completedLevels.includes(14)) {
+            document.getElementById('thunder-world-container').style.display = 'block';
+        }
+
+        // Appliquer le style foudre et révéler les niveaux un par un
+        if (thunderUnlocked) {
+            document.body.classList.add('thunder-mode');
+            document.getElementById('levels-grid-thunder').style.display = 'grid';
+            
+            // Révéler les niveaux un par un avec animation
+            for (let i = 15; i <= 28; i++) {
+                const delay = (i - 15) * 350; // 0.35s entre chaque niveau
+                setTimeout(() => {
+                    const levelCard = document.querySelector(`.level-card[data-level="${i}"]`);
+                    if (levelCard) {
+                        levelCard.style.display = 'block';
+                        levelCard.style.animation = 'fadeInScale 0.3s ease-out';
+                    }
+                }, delay);
+            }
+        }
+
+        function showThunderAnimation() {
+            const animationDiv = document.getElementById('thunder-animation');
+            const canvas = document.getElementById('thunder-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Mettre le canvas en plein écran
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            animationDiv.style.display = 'flex';
+            
+            let frame = 0;
+            const totalFrames = 150; // 5 secondes à 30fps
+            let particles = [];
+            
+            // Créer des particules arc-en-ciel
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    color: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'][Math.floor(Math.random() * 7)],
+                    size: Math.random() * 3 + 1
+                });
+            }
+            
+            function animate() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                const progress = frame / totalFrames;
+                
+                // Phase 1: Arc-en-ciel avec particules (0-35%)
+                if (progress < 0.35) {
+                    const rainbowProgress = progress / 0.35;
+                    drawRainbow(ctx, rainbowProgress);
+                    drawParticles(ctx, particles, rainbowProgress);
+                    drawText(ctx, '🌈 Arc-en-ciel Magique 🌈', rainbowProgress);
+                }
+                // Phase 2: Transition explosive (35-50%)
+                else if (progress < 0.5) {
+                    const transitionProgress = (progress - 0.35) / 0.15;
+                    drawRainbow(ctx, 1 - transitionProgress * 0.5);
+                    drawExplosion(ctx, transitionProgress);
+                    drawLightning(ctx, transitionProgress * 0.4);
+                    drawParticles(ctx, particles, 1 - transitionProgress);
+                }
+                // Phase 3: Foudre intense (50-85%)
+                else if (progress < 0.85) {
+                    const thunderProgress = (progress - 0.5) / 0.35;
+                    drawLightning(ctx, 0.4 + thunderProgress * 0.6);
+                    drawElectricField(ctx, thunderProgress);
+                    drawText(ctx, '⚡ MONDE FOUDRE ⚡', thunderProgress);
+                }
+                // Phase 4: Finale (85-100%)
+                else {
+                    const finaleProgress = (progress - 0.85) / 0.15;
+                    drawLightning(ctx, 1);
+                    drawElectricField(ctx, 1);
+                    drawFinalFlash(ctx, finaleProgress);
+                }
+                
+                // Animer les particules
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                });
+                
+                frame++;
+                
+                if (frame <= totalFrames) {
+                    requestAnimationFrame(animate);
+                } else {
+                    setTimeout(() => {
+                        animationDiv.style.display = 'none';
+                        alert('⚡ Le Monde Foudre arrive bientôt ! ⚡');
+                    }, 500);
+                }
+            }
+            
+            function drawRainbow(ctx, alpha) {
+                const colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = Math.min(canvas.width, canvas.height) * 0.4;
+                
+                colors.forEach((color, index) => {
+                    const gradient = ctx.createLinearGradient(centerX - radius, centerY, centerX + radius, centerY);
+                    gradient.addColorStop(0, color);
+                    gradient.addColorStop(1, colors[(index + 1) % colors.length]);
+                    
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 30;
+                    ctx.globalAlpha = alpha;
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = color;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius - index * 25, 0, Math.PI, true);
+                    ctx.stroke();
+                });
+                
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+            }
+            
+            function drawParticles(ctx, particles, alpha) {
+                particles.forEach(p => {
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = alpha;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+            }
+            
+            function drawExplosion(ctx, progress) {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = progress * Math.min(canvas.width, canvas.height) * 0.8;
+                
+                for (let i = 0; i < 8; i++) {
+                    const angle = (Math.PI * 2 * i) / 8;
+                    const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+                    gradient.addColorStop(0, 'rgba(255, 255, 255, ' + (1 - progress) + ')');
+                    gradient.addColorStop(0.5, 'rgba(255, 200, 0, ' + (0.5 - progress * 0.5) + ')');
+                    gradient.addColorStop(1, 'rgba(255, 100, 0, 0)');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            function drawLightning(ctx, intensity) {
+                const centerX = canvas.width / 2;
+                const startY = 0;
+                
+                // Dessiner plusieurs éclairs ramifiés
+                for (let i = 0; i < 7; i++) {
+                    const offsetX = (i - 3) * (canvas.width / 8);
+                    drawBolt(ctx, centerX + offsetX, startY, centerX + offsetX + (Math.random() - 0.5) * 200, canvas.height, intensity);
+                    
+                    // Branches secondaires
+                    if (Math.random() > 0.5) {
+                        const midY = canvas.height * 0.5;
+                        drawBolt(ctx, centerX + offsetX, midY, centerX + offsetX + (Math.random() - 0.5) * 150, canvas.height * 0.8, intensity * 0.6);
+                    }
+                }
+                
+                // Flash de fond avec dégradé
+                const gradient = ctx.createRadialGradient(centerX, canvas.height / 2, 0, centerX, canvas.height / 2, canvas.width / 2);
+                gradient.addColorStop(0, 'rgba(255, 255, 100, ' + (intensity * 0.4) + ')');
+                gradient.addColorStop(1, 'rgba(50, 50, 150, ' + (intensity * 0.2) + ')');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            function drawElectricField(ctx, intensity) {
+                // Dessiner un champ électrique ambiant
+                for (let i = 0; i < 20; i++) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height;
+                    const size = Math.random() * 3 + 1;
+                    
+                    ctx.fillStyle = 'rgba(100, 200, 255, ' + (intensity * 0.8) + ')';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = '#64c8ff';
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.shadowBlur = 0;
+            }
+            
+            function drawBolt(ctx, x1, y1, x2, y2, intensity) {
+                // Éclair principal
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 4 + intensity * 8;
+                ctx.shadowBlur = 40;
+                ctx.shadowColor = '#ffff00';
+                ctx.globalAlpha = intensity;
+                
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                
+                const segments = 12;
+                for (let i = 1; i <= segments; i++) {
+                    const progress = i / segments;
+                    const x = x1 + (x2 - x1) * progress + (Math.random() - 0.5) * 60 * intensity;
+                    const y = y1 + (y2 - y1) * progress;
+                    ctx.lineTo(x, y);
+                }
+                
+                ctx.stroke();
+                
+                // Éclair secondaire plus fin
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 20;
+                ctx.stroke();
+                
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+            }
+            
+            function drawText(ctx, text, alpha) {
+                ctx.font = 'bold 60px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#ffffff';
+                ctx.globalAlpha = alpha;
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = '#ffffff';
+                ctx.fillText(text, canvas.width / 2, canvas.height * 0.85);
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+            }
+            
+            function drawFinalFlash(ctx, progress) {
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + (progress * 0.8) + ')';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // À la fin de l'animation, révéler les niveaux automatiquement
+            setTimeout(() => {
+                animationDiv.style.display = 'none';
+                
+                // Marquer que le monde foudre est débloqué
+                localStorage.setItem('codecombat_thunder_unlocked', 'true');
+                localStorage.setItem('codecombat_thunder_revealed', '0');
+                
+                // Recharger la page pour afficher les nouveaux niveaux
+                window.location.reload();
+            }, (totalFrames / 30) * 1000);
+            
+            animate();
         }
     </script>
 </body>
 </html>
+            // À la fin de l'animation, révéler les niveaux automatiquement
+            setTimeout(() => {
+                animationDiv.style.display = 'none';
+                
+                // Marquer que le monde foudre est débloqué
+                localStorage.setItem('codecombat_thunder_unlocked', 'true');
+                
+                // Recharger la page pour afficher les nouveaux niveaux
+                window.location.reload();
+            }, (totalFrames / 30) * 1000);

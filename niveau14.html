@@ -45,6 +45,24 @@
             margin: 0;
             font-size: 1.3em;
         }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .info-panel h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            color: #4a5568;
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
     </style>
 </head>
 <body>
@@ -66,14 +84,12 @@
                     <h2>👑 BOSS FINAL 👑</h2>
                 </div>
                 <canvas id="game-canvas" width="600" height="400"></canvas>
-                
-
             </div>
 
             <!-- Panneau de commandes -->
             <div class="controls-area">
                 <div class="phase-indicator">
-                    <h3 id="phase-title">Phase 1/5</h3>
+                    <h3 id="phase-title">Phase 1/5 - Premier Combat</h3>
                 </div>
 
                 <h2>Commandes</h2>
@@ -82,7 +98,7 @@
                     <div class="health-bar">
                         <div class="health-fill" id="hero-health"></div>
                     </div>
-                    <span class="health-text"><span id="health-value">6</span>/6</span>
+                    <span class="health-text"><span id="health-value">5</span>/5</span>
                 </div>
                 
                 <div class="command-buttons" id="command-buttons">
@@ -90,15 +106,14 @@
                     <button class="cmd-btn" onclick="moveHero('bas')">⬇️ En Bas</button>
                     <button class="cmd-btn" onclick="moveHero('gauche')">⬅️ À Gauche</button>
                     <button class="cmd-btn" onclick="moveHero('droite')">➡️ À Droite</button>
-                    <button class="cmd-btn" onclick="usePortal()" id="btn-portail">🔴 Portail</button>
-                    <button class="cmd-btn" onclick="allyShoot()" id="btn-fleche" style="display:none;">🏹 Lancer Flèche</button>
-                    <button class="cmd-btn" onclick="placeBlock()" id="btn-poser" style="display:none;">🧱 Poser Bloc</button>
-                    <button class="cmd-btn cmd-attack" onclick="attackEnemy()" id="btn-attaque" style="display:none;">⚔️ Attaquer</button>
+                    <button class="cmd-btn cmd-attack" onclick="attackEnemy()" id="btn-attaque">⚔️ Attaquer</button>
+                    <button class="cmd-btn" onclick="usePortal()" id="btn-portail" style="display:none; background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);">🔴 Utiliser Portail</button>
+                    <button class="cmd-btn cmd-ally-attack" onclick="allyShoot()" id="btn-fleche" style="display:none;">🏹 Lancer Flèche</button>
                 </div>
 
                 <div class="info-panel">
-                    <h3>📋 Boss Final</h3>
-                    <p id="info-text">Utilise toutes tes compétences pour vaincre le boss !</p>
+                    <h3>📋 Objectif</h3>
+                    <p id="info-text">Tu es enfermé avec un ennemi à 2 blocs ! Rapproche-toi et attaque-le !</p>
                 </div>
             </div>
         </div>
